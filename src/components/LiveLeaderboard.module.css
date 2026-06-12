@@ -1,0 +1,128 @@
+.container {
+  background: #090d26;
+  padding: 40px 20px;
+}
+
+.leaderboardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.leaderboardSection {
+  background: #0f1535;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1a1f3a;
+}
+
+.leaderboardTitle {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: #FFD700;
+  padding: 20px;
+  border-bottom: 2px solid #FFD700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background: #0a0d1a;
+  padding: 12px;
+  text-align: left;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  color: #00e5ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #1a1f3a;
+  font-weight: 700;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #1a1f3a;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.table tr:hover {
+  background: rgba(0, 229, 255, 0.05);
+}
+
+.rankCell {
+  font-weight: 700;
+  color: #FFD700;
+  min-width: 40px;
+}
+
+.nameCell {
+  font-weight: 600;
+}
+
+.scoreCell {
+  font-weight: 700;
+  color: #00e5ff;
+  text-align: right;
+  min-width: 60px;
+}
+
+.row1 {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.row2 {
+  background: rgba(192, 192, 192, 0.1);
+}
+
+.row3 {
+  background: rgba(205, 127, 50, 0.1);
+}
+
+.sectionBadge {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@media (max-width: 1024px) {
+  .leaderboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .leaderboardGrid {
+    gap: 20px;
+  }
+
+  .leaderboardTitle {
+    font-size: 16px;
+    padding: 16px;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+}

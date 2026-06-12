@@ -1,0 +1,159 @@
+.card {
+  background: #0f1535;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pictureContainer {
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: #0a0d1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.picture {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card.gold {
+  border-color: #FFD700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.card.silver {
+  border-color: #C0C0C0;
+  box-shadow: 0 0 20px rgba(192, 192, 192, 0.3);
+}
+
+.card.bronze {
+  border-color: #CD7F32;
+  box-shadow: 0 0 20px rgba(205, 127, 50, 0.3);
+}
+
+.card.flash {
+  animation: scoreFlash 0.6s ease-out;
+}
+
+@keyframes scoreFlash {
+  0% {
+    background: rgba(0, 230, 118, 0.3);
+  }
+  100% {
+    background: #0f1535;
+  }
+}
+
+.name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.scoreContainer {
+  margin-bottom: 16px;
+}
+
+.score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: #FFD700;
+  margin: 0;
+  font-weight: 700;
+}
+
+.label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  color: #00e5ff;
+  margin-top: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.positionBadge {
+  display: inline-block;
+  background: #FFD700;
+  color: #090d26;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.positionBadge.silver {
+  background: #C0C0C0;
+}
+
+.positionBadge.bronze {
+  background: #CD7F32;
+}
+
+.watchButton {
+  background: #00e5ff;
+  color: #090d26;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.watchButton:hover {
+  background: #00d4e8;
+  transform: scale(1.05);
+}
+
+.watchButton:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 16px;
+  }
+
+  .name {
+    font-size: 14px;
+  }
+
+  .score {
+    font-size: 28px;
+  }
+
+  .positionBadge {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .watchButton {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+}

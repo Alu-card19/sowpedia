@@ -1,101 +1,131 @@
-import Image from "next/image";
+'use client'
+
+import { useEffect, useState } from 'react'
+import HeroSection from '@/components/HeroSection'
+import SectionTabs from '@/components/SectionTabs'
+import ContestantGrid from '@/components/ContestantGrid'
+import LiveLeaderboard from '@/components/LiveLeaderboard'
+import SponsorBar from '@/components/SponsorBar'
+import VideoModal from '@/components/VideoModal'
+import { supabase } from '@/lib/supabase'
+import { Contestant, Section, Sponsor } from '@/lib/types'
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [sections, setSections] = useState<Section[]>([])
+  const [contestants, setContestants] = useState<Contestant[]>([])
+  const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [selectedContestant, setSelectedContestant] = useState<Contestant | null>(null)
+  const [updatedContestantId, setUpdatedContestantId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Fetch initial data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch sections
+        const { data: sectionsData, error: sectionsError } = await supabase
+          .from('sections')
+          .select('*')
+          .order('order_index')
+
+        if (sectionsError) throw sectionsError
+        setSections(sectionsData || [])
+
+        // Set first section as active
+        if (sectionsData && sectionsData.length > 0) {
+          setActiveSection(sectionsData[0].name)
+        }
+
+        // Fetch contestants
+        const { data: contestantsData, error: contestantsError } = await supabase
+          .from('contestants')
+          .select('*')
+
+        if (contestantsError) throw contestantsError
+        setContestants(contestantsData || [])
+
+        // Fetch sponsors
+        const { data: sponsorsData, error: sponsorsError } = await supabase
+          .from('sponsors')
+          .select('*')
+          .order('order_index')
+
+        if (sponsorsError) throw sponsorsError
+        setSponsors(sponsorsData || [])
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Subscribe to realtime updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('contestants-updates')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'contestants' },
+        (payload) => {
+          const updatedContestant = payload.new as Contestant
+
+          // Update local state
+          setContestants((prev) =>
+            prev.map((c) => (c.id === updatedContestant.id ? updatedContestant : c))
+          )
+
+          // Set flash animation
+          setUpdatedContestantId(updatedContestant.id)
+          setTimeout(() => setUpdatedContestantId(null), 600)
+
+          // Update last score update time for LIVE badge
+          localStorage.setItem('lastScoreUpdate', Date.now().toString())
+        }
+      )
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ background: '#090d26', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#FFD700', fontFamily: 'Bebas Neue, sans-serif', fontSize: '24px' }}>
+          Loading...
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <HeroSection />
+      <SectionTabs
+        sections={sections}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+      <ContestantGrid
+        contestants={contestants}
+        activeSection={activeSection}
+        onWatchClick={setSelectedContestant}
+        updatedContestantId={updatedContestantId}
+      />
+      <LiveLeaderboard
+        contestants={contestants}
+        activeSection={activeSection}
+      />
+      <SponsorBar sponsors={sponsors} />
+      <VideoModal
+        contestant={selectedContestant}
+        onClose={() => setSelectedContestant(null)}
+      />
+    </>
+  )
 }

@@ -1,0 +1,174 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.section {
+  background: #0f1535;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.sectionTitle {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: #FFD700;
+  margin: 0 0 20px 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  color: #00e5ff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.input, .select, .textarea {
+  padding: 10px;
+  background: #0a0d1a;
+  border: 1px solid #1a1f3a;
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  width: 100%;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: #FFD700;
+}
+
+.table .input, .table .select {
+  width: 100%;
+  padding: 6px;
+  font-size: 12px;
+}
+
+.button {
+  padding: 10px 16px;
+  background: #00e5ff;
+  color: #090d26;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  background: #00d4e8;
+}
+
+.buttonSecondary {
+  background: #FFD700;
+  color: #090d26;
+}
+
+.buttonSecondary:hover {
+  background: #FFF000;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th {
+  background: #0a0d1a;
+  padding: 10px;
+  text-align: left;
+  color: #00e5ff;
+  font-family: 'Bebas Neue', sans-serif;
+  border-bottom: 1px solid #1a1f3a;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #1a1f3a;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+}
+
+.table tr:hover {
+  background: rgba(0, 229, 255, 0.05);
+}
+
+.pictureThumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #0a0d1a;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.buttonSmall {
+  padding: 6px 10px;
+  font-size: 10px;
+  background: #00e5ff;
+  color: #090d26;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonSmall:hover {
+  background: #00d4e8;
+  transform: translateY(-1px);
+}
+
+.buttonSmallDanger {
+  background: #C8102E;
+  color: #ffffff;
+}
+
+.buttonSmallDanger:hover {
+  background: #a00820;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}

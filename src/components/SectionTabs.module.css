@@ -1,0 +1,52 @@
+.container {
+  background: #090d26;
+  padding: 30px 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #FFD700 #090d26;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  min-width: min-content;
+  max-width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 12px 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: #888;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+
+.tab:hover {
+  color: #FFD700;
+}
+
+.tabActive {
+  color: #ffffff;
+  border-bottom-color: #FFD700;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 0;
+  }
+
+  .tab {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+}

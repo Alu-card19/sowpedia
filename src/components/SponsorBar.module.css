@@ -1,0 +1,85 @@
+.container {
+  background: linear-gradient(135deg, #090d26 0%, #0f1535 100%);
+  padding: 40px 20px;
+  border-top: 2px solid #FFD700;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: #FFD700;
+  text-align: center;
+  margin: 0 0 30px 0;
+  letter-spacing: 1px;
+}
+
+.marqueeContainer {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee {
+  display: flex;
+  gap: 0;
+  animation: scroll 30s linear infinite;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.logoCard {
+  flex-shrink: 0;
+  min-width: 120px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoCard img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 30px 16px;
+  }
+
+  .title {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .logoCard {
+    min-width: 100px;
+    height: 70px;
+  }
+
+  .gridContainer {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+}

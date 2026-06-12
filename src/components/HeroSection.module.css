@@ -1,0 +1,158 @@
+.hero {
+  background: linear-gradient(135deg, #090d26 0%, #0f1535 100%);
+  padding: 60px 20px;
+  text-align: center;
+  border-bottom: 2px solid #FFD700;
+  position: relative;
+}
+
+.logoContainer {
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 10px 0;
+  letter-spacing: 2px;
+}
+
+.subheading {
+  font-family: 'Nunito', sans-serif;
+  font-size: 24px;
+  color: #FFD700;
+  margin: 0 0 20px 0;
+  font-weight: 600;
+}
+
+.year {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: #00e5ff;
+  margin-bottom: 20px;
+}
+
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(200, 16, 46, 0.2);
+  border: 1px solid #C8102E;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #C8102E;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.liveDot {
+  width: 10px;
+  height: 10px;
+  background: #C8102E;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.decorativeLine {
+  width: 200px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #FFD700, transparent);
+  margin: 20px auto;
+}
+
+.shareContainer {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.shareButton {
+  background: #00e5ff;
+  color: #090d26;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shareButton:hover {
+  background: #00d4e8;
+  transform: scale(1.05);
+}
+
+.shareLink {
+  background: #0f1535;
+  border: 1px solid #1a1f3a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #00e5ff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  word-break: break-all;
+  max-width: 300px;
+}
+
+.copyNotification {
+  background: #00e676;
+  color: #090d26;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 40px 16px;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .heading {
+    font-size: 36px;
+  }
+
+  .subheading {
+    font-size: 18px;
+  }
+}
