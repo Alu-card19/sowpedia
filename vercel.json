@@ -14,8 +14,7 @@
       "description": "Supabase service role key"
     },
     "NEXT_PUBLIC_ADMIN_PASSWORD": {
-      "description": "Admin panel password",
-      "value": "sow2025"
+      "description": "Admin panel password (set in Vercel dashboard only)"
     }
   }
 }

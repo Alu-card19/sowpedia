@@ -1,11 +1,19 @@
 import { supabaseServer } from '@/lib/supabase'
+import { CreateContestantSchema, UpdateContestantSchema, DeleteContestantSchema } from '@/lib/validation'
+import { rateLimit } from '@/lib/rateLimit'
 import { NextRequest, NextResponse } from 'next/server'
+import { ZodError } from 'zod'
 
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD 
 
 function validateAdminPassword(request: NextRequest): boolean {
   const password = request.headers.get('x-admin-password')
   return password === ADMIN_PASSWORD
+}
+
+function handleValidationError(error: ZodError<unknown>) {
+  const messages = error.issues.map((err) => `${err.path.join('.')}: ${err.message}`).join('; ')
+  return NextResponse.json({ error: `Validation error: ${messages}` }, { status: 400 })
 }
 
 export async function GET() {
@@ -29,30 +37,35 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting - 20 requests per minute per IP
+  const rateLimitResult = rateLimit(request, {
+    windowMs: 60 * 1000,
+    maxRequests: 20,
+  })
+  if (rateLimitResult.limited) {
+    return rateLimitResult.response
+  }
+
   if (!validateAdminPassword(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const body = await request.json()
-    const { name, section, youtube_url } = body
-
-    if (!name || !section) {
-      return NextResponse.json(
-        { error: 'Name and section are required' },
-        { status: 400 }
-      )
-    }
+    
+    // Validate input
+    const validatedData = CreateContestantSchema.parse(body)
 
     const { data, error } = await supabaseServer
       .from('contestants')
       .insert([
         {
-          name,
-          section,
-          youtube_url: youtube_url || null,
+          name: validatedData.name,
+          section: validatedData.section,
+          youtube_url: validatedData.youtube_url || null,
           picture_url: null,
           score: 0,
+          position: 0,
         },
       ])
       .select()
@@ -61,6 +74,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data[0])
   } catch (error) {
+    if (error instanceof ZodError) {
+      return handleValidationError(error)
+    }
     console.error('Error creating contestant:', error)
     return NextResponse.json(
       { error: 'Failed to create contestant' },
@@ -70,35 +86,39 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  // Rate limiting - 30 requests per minute per IP
+  const rateLimitResult = rateLimit(request, {
+    windowMs: 60 * 1000,
+    maxRequests: 30,
+  })
+  if (rateLimitResult.limited) {
+    return rateLimitResult.response
+  }
+
   if (!validateAdminPassword(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const body = await request.json()
-    const { id, name, section, youtube_url, picture_url } = body
-
-    if (!id) {
-      return NextResponse.json(
-        { error: 'ID is required' },
-        { status: 400 }
-      )
-    }
+    
+    // Validate input
+    const validatedData = UpdateContestantSchema.parse(body)
 
     // Build update object - only include fields that are provided
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     
-    if (name !== undefined) updateData.name = name
-    if (section !== undefined) updateData.section = section
-    if (youtube_url !== undefined) updateData.youtube_url = youtube_url
-    if (picture_url !== undefined) updateData.picture_url = picture_url
+    if (validatedData.name !== undefined) updateData.name = validatedData.name
+    if (validatedData.section !== undefined) updateData.section = validatedData.section
+    if (validatedData.youtube_url !== undefined) updateData.youtube_url = validatedData.youtube_url
+    if (validatedData.picture_url !== undefined) updateData.picture_url = validatedData.picture_url
 
-    console.log('Updating contestant with:', { id, updateData })
+    console.log('Updating contestant with:', { id: validatedData.id, updateData })
 
     const { data, error } = await supabaseServer
       .from('contestants')
       .update(updateData)
-      .eq('id', id)
+      .eq('id', validatedData.id)
       .select()
 
     if (error) {
@@ -116,6 +136,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(data[0])
   } catch (error) {
+    if (error instanceof ZodError) {
+      return handleValidationError(error)
+    }
     console.error('Error updating contestant:', error)
     let errorMessage = 'Unknown error'
     
@@ -135,6 +158,15 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  // Rate limiting - 10 requests per minute per IP
+  const rateLimitResult = rateLimit(request, {
+    windowMs: 60 * 1000,
+    maxRequests: 10,
+  })
+  if (rateLimitResult.limited) {
+    return rateLimitResult.response
+  }
+
   if (!validateAdminPassword(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -150,15 +182,21 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
+    // Validate ID
+    const validatedData = DeleteContestantSchema.parse({ id })
+
     const { error } = await supabaseServer
       .from('contestants')
       .delete()
-      .eq('id', id)
+      .eq('id', validatedData.id)
 
     if (error) throw error
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    if (error instanceof ZodError) {
+      return handleValidationError(error)
+    }
     console.error('Error deleting contestant:', error)
     return NextResponse.json(
       { error: 'Failed to delete contestant' },

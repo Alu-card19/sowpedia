@@ -42,13 +42,15 @@ export function getSupabaseServer(): SupabaseClient {
 
 // Backwards compatibility exports - use getters to defer initialization
 export const supabase = new Proxy({} as SupabaseClient, {
-  get(target, prop) {
-    return (getSupabase() as any)[prop]
+  get(_target, prop: string | symbol) {
+    const client = getSupabase()
+    return (client as unknown as Record<string | symbol, unknown>)[prop]
   }
 })
 
 export const supabaseServer = new Proxy({} as SupabaseClient, {
-  get(target, prop) {
-    return (getSupabaseServer() as any)[prop]
+  get(_target, prop: string | symbol) {
+    const client = getSupabaseServer()
+    return (client as unknown as Record<string | symbol, unknown>)[prop]
   }
 })
