@@ -5,15 +5,19 @@
   "framework": "nextjs",
   "env": {
     "NEXT_PUBLIC_SUPABASE_URL": {
+      "type": "string",
       "description": "Supabase project URL"
     },
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": {
+      "type": "string",
       "description": "Supabase anonymous key"
     },
     "SUPABASE_SERVICE_ROLE_KEY": {
+      "type": "string",
       "description": "Supabase service role key"
     },
     "NEXT_PUBLIC_ADMIN_PASSWORD": {
+      "type": "string",
       "description": "Admin panel password (set in Vercel dashboard only)"
     }
   }
