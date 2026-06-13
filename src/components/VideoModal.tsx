@@ -17,6 +17,22 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
     }
   }
 
+  // Convert YouTube URL to embed format
+  const getEmbedUrl = (url: string): string => {
+    // Handle youtube.com/watch?v=ID
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
+    if (watchMatch?.[1]) {
+      return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`
+    }
+    // If already in embed format, just add autoplay
+    if (url.includes('/embed/')) {
+      return url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`
+    }
+    return url
+  }
+
+  const embedUrl = getEmbedUrl(contestant.youtube_url)
+
   return (
     <div className={styles.backdrop} onClick={handleBackdropClick}>
       <div className={styles.modal}>
@@ -28,9 +44,10 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
         </div>
         <div className={styles.videoContainer}>
           <iframe
-            src={`${contestant.youtube_url}?autoplay=1`}
+            src={embedUrl}
             allowFullScreen
-            allow="autoplay"
+            allow="autoplay; fullscreen"
+            title={`Intro video for ${contestant.name}`}
           />
         </div>
       </div>
