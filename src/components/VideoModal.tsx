@@ -1,6 +1,7 @@
 'use client'
 
 import { Contestant } from '@/lib/types'
+import { useEffect, useRef } from 'react'
 import styles from './VideoModal.module.css'
 
 interface VideoModalProps {
@@ -9,6 +10,8 @@ interface VideoModalProps {
 }
 
 export default function VideoModal({ contestant, onClose }: VideoModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null)
+
   if (!contestant || !contestant.youtube_url) return null
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -16,6 +19,30 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
       onClose()
     }
   }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Close on Escape key
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      onClose()
+    }
+  }
+
+  // Focus management - focus modal on open, restore focus on close
+  useEffect(() => {
+    const previousActiveElement = document.activeElement as HTMLElement
+
+    if (modalRef.current) {
+      modalRef.current.focus()
+    }
+
+    return () => {
+      // Restore focus when modal closes
+      if (previousActiveElement) {
+        previousActiveElement.focus()
+      }
+    }
+  }, [])
 
   // Convert YouTube URL to embed format
   const getEmbedUrl = (url: string): string => {
@@ -34,11 +61,30 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
   const embedUrl = getEmbedUrl(contestant.youtube_url)
 
   return (
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
-      <div className={styles.modal}>
+    <div
+      className={styles.backdrop}
+      onClick={handleBackdropClick}
+      role="presentation"
+      onKeyDown={handleKeyDown}
+    >
+      <div
+        className={styles.modal}
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="video-modal-title"
+        tabIndex={-1}
+      >
         <div className={styles.header}>
-          <h2 className={styles.title}>{contestant.name}</h2>
-          <button className={styles.closeButton} onClick={onClose}>
+          <h2 className={styles.title} id="video-modal-title">
+            {contestant.name} - Intro Video
+          </h2>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Close video modal"
+            title="Close (Esc)"
+          >
             ×
           </button>
         </div>
@@ -48,6 +94,7 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
             allowFullScreen
             allow="autoplay; fullscreen"
             title={`Intro video for ${contestant.name}`}
+            aria-label={`Intro video for ${contestant.name}`}
           />
         </div>
       </div>

@@ -38,9 +38,7 @@ export default function LiveScoreBoard({
     )
 
     try {
-      console.log('Updating score:', { id, newScore })
-      const result = await apiPost('/api/scores', { id, score: newScore })
-      console.log('Score update success:', result)
+      await apiPost('/api/scores', { id, score: newScore })
     } catch (error) {
       console.error('Error updating score:', error)
       // Revert on error

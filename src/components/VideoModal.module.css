@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,11 +24,18 @@
 
 .modal {
   background: #0f1535;
+  border: 2px solid #00e5ff;
   border-radius: 12px;
   max-width: 800px;
   width: 100%;
   overflow: hidden;
   animation: slideUp 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+.modal:focus {
+  outline: 3px solid #FFD700;
+  outline-offset: -3px;
 }
 
 @keyframes slideUp {
@@ -47,7 +54,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #1a1f3a;
+  border-bottom: 2px solid #1a1f3a;
+  background: linear-gradient(135deg, #0f1535 0%, #1a1f3a 100%);
 }
 
 .title {
@@ -56,26 +64,39 @@
   color: #FFD700;
   margin: 0;
   letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .closeButton {
   background: transparent;
-  border: none;
+  border: 2px solid #00e5ff;
   color: #00e5ff;
-  font-size: 28px;
+  font-size: 24px;
   cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
+  padding: 4px 8px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .closeButton:hover {
-  color: #FFD700;
-  transform: rotate(90deg);
+  background: #00e5ff;
+  color: #090d26;
+  transform: scale(1.1);
+}
+
+.closeButton:focus {
+  outline: 3px solid #FFD700;
+  outline-offset: 2px;
+}
+
+.closeButton:active {
+  transform: scale(0.95);
 }
 
 .videoContainer {
@@ -108,6 +129,10 @@
     flex-direction: column;
   }
 
+  .header {
+    padding: 16px;
+  }
+
   .videoContainer {
     flex: 1;
   }
@@ -115,4 +140,11 @@
   .title {
     font-size: 16px;
   }
+
+  .closeButton {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
 }
+

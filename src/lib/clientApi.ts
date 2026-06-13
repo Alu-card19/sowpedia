@@ -5,8 +5,6 @@
 
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025'
 
-console.log('[clientApi] Admin password loaded:', ADMIN_PASSWORD)
-
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>
 }
@@ -28,23 +26,17 @@ async function fetchJson<T>(
   url: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const headers = getHeaders(options.headers)
-  console.log('[fetchJson] Request:', { url, method: options.method, headers: { 'x-admin-password': '***' } })
-  
   const response = await fetch(url, {
     ...options,
-    headers,
+    headers: getHeaders(options.headers),
   })
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: response.statusText }))
-    console.error('[fetchJson] Error response:', { status: response.status, error })
     throw new Error(error.error || response.statusText)
   }
 
-  const data = await response.json()
-  console.log('[fetchJson] Success:', { url, data })
-  return data
+  return response.json()
 }
 
 /**

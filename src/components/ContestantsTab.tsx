@@ -5,6 +5,11 @@ import dynamic from 'next/dynamic'
 import { Contestant, Section } from '@/lib/types'
 import { supabaseServer } from '@/lib/supabase'
 import { apiPost, apiPut, apiDelete } from '@/lib/clientApi'
+import {
+  validateAddContestantForm,
+  validateBulkAddForm,
+  formatErrors,
+} from '@/lib/clientValidation'
 import styles from './ContestantsTab.module.css'
 
 // Dynamically import modal to reduce bundle size
@@ -30,6 +35,7 @@ export default function ContestantsTab({
   const [bulkNames, setBulkNames] = useState('')
   const [bulkSection, setBulkSection] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [editSection, setEditSection] = useState('')
@@ -39,7 +45,14 @@ export default function ContestantsTab({
 
   const handleAddContestant = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !section) return
+    setError(null)
+
+    // Client-side validation
+    const validation = validateAddContestantForm(name, section, youtubeUrl)
+    if (!validation.valid) {
+      setError(formatErrors(validation.errors))
+      return
+    }
 
     setLoading(true)
     try {
@@ -51,20 +64,26 @@ export default function ContestantsTab({
       setName('')
       setYoutubeUrl('')
       setSection('')
+      setError(null)
       onRefresh()
-    } catch (error) {
-      console.error('Error adding contestant:', error)
-      alert(`Failed to add contestant: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } catch (err) {
+      setError(`Failed to add contestant: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
   }
 
   const handleBulkAdd = async () => {
-    if (!bulkNames || !bulkSection) return
+    setError(null)
+
+    // Client-side validation
+    const validation = validateBulkAddForm(bulkNames, bulkSection)
+    if (!validation.valid) {
+      setError(formatErrors(validation.errors))
+      return
+    }
 
     const names = bulkNames.split('\n').filter((n) => n.trim())
-    if (names.length === 0) return
 
     setLoading(true)
     try {
@@ -77,10 +96,10 @@ export default function ContestantsTab({
       }
       setBulkNames('')
       setBulkSection('')
+      setError(null)
       onRefresh()
-    } catch (error) {
-      console.error('Error bulk adding:', error)
-      alert(`Failed to bulk add: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } catch (err) {
+      setError(`Failed to bulk add: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
@@ -89,12 +108,12 @@ export default function ContestantsTab({
   const handleDeleteContestant = async (id: string) => {
     if (!confirm('Are you sure?')) return
 
+    setError(null)
     try {
       await apiDelete(`/api/contestants?id=${id}`)
       onRefresh()
-    } catch (error) {
-      console.error('Error deleting:', error)
-      alert(`Failed to delete: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } catch (err) {
+      setError(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
   }
 
@@ -103,9 +122,17 @@ export default function ContestantsTab({
     setEditName(contestant.name)
     setEditSection(contestant.section)
     setEditYoutubeUrl(contestant.youtube_url || '')
+    setError(null)
   }
 
   const handleSaveEdit = async (id: string) => {
+    // Client-side validation
+    const nameErr = !editName || editName.length === 0 ? 'Name is required' : null
+    if (nameErr) {
+      setError(nameErr)
+      return
+    }
+
     setLoading(true)
     try {
       let pictureUrl = undefined
@@ -135,10 +162,10 @@ export default function ContestantsTab({
       })
       setEditingId(null)
       setEditPictureFile(null)
+      setError(null)
       onRefresh()
-    } catch (error) {
-      console.error('Error updating:', error)
-      alert(`Failed to update: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } catch (err) {
+      setError(`Failed to update: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
@@ -149,10 +176,12 @@ export default function ContestantsTab({
     setEditName('')
     setEditSection('')
     setEditYoutubeUrl('')
+    setError(null)
   }
 
   const handleImageUploadOpen = (contestant: Contestant) => {
     setImageUploadContestant(contestant)
+    setError(null)
   }
 
   const handleImageUploadClose = () => {
@@ -167,25 +196,56 @@ export default function ContestantsTab({
   return (
     <>
       <div className={styles.container}>
+        {error && (
+          <div
+            className={styles.errorBanner}
+            role="alert"
+            aria-live="polite"
+            style={{
+              backgroundColor: '#FF6B9D',
+              color: '#090d26',
+              padding: '16px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              fontWeight: 'bold',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            ⚠️ {error}
+          </div>
+        )}
+
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Add Single Contestant</h3>
           <form className={styles.form} onSubmit={handleAddContestant}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Name</label>
+              <label className={styles.label} htmlFor="name">
+                Name *
+              </label>
               <input
+                id="name"
                 type="text"
                 className={styles.input}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Contestant name"
+                required
+                aria-required="true"
+                aria-describedby={error ? 'error-banner' : undefined}
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Section</label>
+              <label className={styles.label} htmlFor="section">
+                Section *
+              </label>
               <select
+                id="section"
                 className={styles.select}
                 value={section}
                 onChange={(e) => setSection(e.target.value)}
+                required
+                aria-required="true"
               >
                 <option value="">Select section</option>
                 {sections.map((s) => (
@@ -196,16 +256,23 @@ export default function ContestantsTab({
               </select>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>YouTube URL</label>
+              <label className={styles.label} htmlFor="youtubeUrl">
+                YouTube URL
+              </label>
               <input
+                id="youtubeUrl"
                 type="text"
                 className={styles.input}
                 value={youtubeUrl}
                 onChange={(e) => setYoutubeUrl(e.target.value)}
                 placeholder="https://www.youtube.com/watch?v=..."
+                aria-describedby="youtube-help"
               />
+              <small id="youtube-help" style={{ color: '#00e5ff', marginTop: '4px' }}>
+                Optional: Link to intro video
+              </small>
             </div>
-            <button type="submit" className={styles.button} disabled={loading}>
+            <button type="submit" className={styles.button} disabled={loading} aria-busy={loading}>
               {loading ? 'Adding...' : 'Add Contestant'}
             </button>
           </form>
@@ -215,20 +282,30 @@ export default function ContestantsTab({
           <h3 className={styles.sectionTitle}>Bulk Add (up to 10)</h3>
           <div className={styles.form}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Names (one per line)</label>
+              <label className={styles.label} htmlFor="bulkNames">
+                Names (one per line) *
+              </label>
               <textarea
+                id="bulkNames"
                 className={styles.textarea}
                 value={bulkNames}
                 onChange={(e) => setBulkNames(e.target.value)}
                 placeholder="Name 1&#10;Name 2&#10;Name 3..."
+                required
+                aria-required="true"
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Section</label>
+              <label className={styles.label} htmlFor="bulkSection">
+                Section *
+              </label>
               <select
+                id="bulkSection"
                 className={styles.select}
                 value={bulkSection}
                 onChange={(e) => setBulkSection(e.target.value)}
+                required
+                aria-required="true"
               >
                 <option value="">Select section</option>
                 {sections.map((s) => (
@@ -243,6 +320,7 @@ export default function ContestantsTab({
               className={`${styles.button} ${styles.buttonSecondary}`}
               onClick={handleBulkAdd}
               disabled={loading}
+              aria-busy={loading}
             >
               {loading ? 'Adding...' : 'Bulk Add'}
             </button>
