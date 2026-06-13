@@ -14,7 +14,7 @@ export const UpdateContestantSchema = z.object({
   id: z.string().regex(UUID_REGEX, 'Invalid contestant ID'),
   name: z.string().min(1).max(100).optional(),
   section: z.string().min(1).max(50).optional(),
-  youtube_url: z.string().url().optional().or(z.literal(null)),
+  youtube_url: z.string().url('Invalid YouTube URL').optional().or(z.literal(null)),
   picture_url: z.string().url('Invalid picture URL').optional().or(z.literal(null)),
 })
 

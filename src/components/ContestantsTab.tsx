@@ -43,7 +43,11 @@ export default function ContestantsTab({
 
     setLoading(true)
     try {
-      await apiPost('/api/contestants', { name, section, youtube_url: youtubeUrl })
+      await apiPost('/api/contestants', {
+        name,
+        section,
+        youtube_url: youtubeUrl || null,
+      })
       setName('')
       setYoutubeUrl('')
       setSection('')
@@ -65,7 +69,11 @@ export default function ContestantsTab({
     setLoading(true)
     try {
       for (const n of names.slice(0, 10)) {
-        await apiPost('/api/contestants', { name: n.trim(), section: bulkSection })
+        await apiPost('/api/contestants', {
+          name: n.trim(),
+          section: bulkSection,
+          youtube_url: null,
+        })
       }
       setBulkNames('')
       setBulkSection('')
@@ -122,7 +130,7 @@ export default function ContestantsTab({
         id,
         name: editName,
         section: editSection,
-        youtube_url: editYoutubeUrl,
+        youtube_url: editYoutubeUrl || null,
         ...(pictureUrl && { picture_url: pictureUrl }),
       })
       setEditingId(null)
