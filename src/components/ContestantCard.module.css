@@ -7,6 +7,9 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .pictureContainer {
@@ -20,6 +23,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  flex-shrink: 0;
 }
 
 .picture {
@@ -56,50 +60,20 @@
   }
 }
 
-.name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  color: #ffffff;
-  margin: 0 0 12px 0;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.scoreContainer {
-  margin-bottom: 16px;
-}
-
-.score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px;
-  color: #FFD700;
-  margin: 0;
-  font-weight: 700;
-}
-
-.label {
-  font-family: 'Nunito', sans-serif;
-  font-size: 12px;
-  color: #00e5ff;
-  margin-top: 4px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
 .positionBadge {
-  display: inline-block;
+  display: inline-flex;
   background: #FFD700;
   color: #090d26;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
+  width: 36px;
+  height: 36px;
   align-items: center;
   justify-content: center;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 20px;
-  margin-bottom: 16px;
+  margin: 0 auto 12px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .positionBadge.silver {
@@ -108,6 +82,48 @@
 
 .positionBadge.bronze {
   background: #CD7F32;
+}
+
+.name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  line-height: 1.3;
+  word-break: break-word;
+  min-height: 2.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scoreContainer {
+  margin-bottom: 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  color: #FFD700;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  color: #00e5ff;
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .watchButton {
@@ -123,6 +139,8 @@
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 .watchButton:hover {
@@ -134,27 +152,90 @@
   transform: scale(0.98);
 }
 
+/* Tablet - max-width: 768px */
 @media (max-width: 768px) {
   .card {
     padding: 16px;
   }
 
+  .pictureContainer {
+    height: 140px;
+    margin-bottom: 12px;
+  }
+
+  .positionBadge {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
   .name {
     font-size: 14px;
+    margin-bottom: 8px;
+    min-height: 2.4em;
+  }
+
+  .score {
+    font-size: 32px;
+  }
+
+  .label {
+    font-size: 10px;
+  }
+
+  .scoreContainer {
+    margin-bottom: 12px;
+  }
+
+  .watchButton {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+}
+
+/* Mobile - max-width: 480px */
+@media (max-width: 480px) {
+  .card {
+    padding: 12px;
+  }
+
+  .pictureContainer {
+    height: 100px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+  }
+
+  .positionBadge {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .name {
+    font-size: 12px;
+    margin-bottom: 6px;
+    min-height: 2.2em;
+    letter-spacing: 0.5px;
   }
 
   .score {
     font-size: 28px;
   }
 
-  .positionBadge {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
+  .label {
+    font-size: 9px;
+  }
+
+  .scoreContainer {
+    margin-bottom: 10px;
+    gap: 2px;
   }
 
   .watchButton {
-    padding: 8px 12px;
-    font-size: 11px;
+    padding: 6px 10px;
+    font-size: 10px;
+    border-radius: 6px;
   }
 }
