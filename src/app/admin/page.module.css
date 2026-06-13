@@ -28,12 +28,68 @@
   margin: 0;
 }
 
+/* Tablet and below */
 @media (max-width: 768px) {
   .container {
     padding: 16px;
   }
 
   .title {
-    font-size: 24px;
+    font-size: 28px;
+    letter-spacing: 0.5px;
   }
+
+  .subtitle {
+    font-size: 13px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+}
+
+/* Mobile only */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .content {
+    margin: 0;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+  .container {
+    padding: 32px 20px;
+  }
+
+  .content {
+    padding: 0 40px;
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #090d26;
+  color: #FFD700;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
 }

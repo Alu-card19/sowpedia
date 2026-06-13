@@ -1,6 +1,7 @@
 'use client'
 
 import { Sponsor } from '@/lib/types'
+import Image from 'next/image'
 import styles from './SponsorBar.module.css'
 
 interface SponsorBarProps {
@@ -29,8 +30,14 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
               {duplicatedSponsors.map((sponsor, idx) => (
                 <div key={`${sponsor.id}-${idx}`} className={styles.logoCard}>
                   {sponsor.logo_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={sponsor.logo_url} alt={sponsor.name} title={sponsor.name} />
+                    <Image
+                      src={sponsor.logo_url}
+                      alt={sponsor.name}
+                      title={sponsor.name}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      sizes="(max-width: 768px) 80px, 120px"
+                    />
                   )}
                 </div>
               ))}
@@ -49,8 +56,14 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
           {sortedSponsors.map((sponsor) => (
             <div key={sponsor.id} className={styles.logoCard}>
               {sponsor.logo_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={sponsor.logo_url} alt={sponsor.name} title={sponsor.name} />
+                <Image
+                  src={sponsor.logo_url}
+                  alt={sponsor.name}
+                  title={sponsor.name}
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  sizes="(max-width: 768px) 100px, 150px"
+                />
               )}
             </div>
           ))}

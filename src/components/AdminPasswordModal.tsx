@@ -34,14 +34,28 @@ export default function AdminPasswordModal({ onSuccess }: AdminPasswordModalProp
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e as unknown as React.FormEvent)
+    }
+    if (e.key === 'Escape') {
+      // Allow escape to potentially close modal
+      e.preventDefault()
+    }
+  }
+
   if (!mounted) return null
 
   return (
-    <div className={styles.backdrop}>
-      <div className={styles.modal}>
-        <h2 className={styles.title}>Admin Panel</h2>
+    <div className={styles.backdrop} role="presentation">
+      <div className={styles.modal} role="dialog" aria-labelledby="admin-modal-title">
+        <h2 className={styles.title} id="admin-modal-title">Admin Panel</h2>
         <form onSubmit={handleSubmit}>
-          {error && <div className={styles.error}>{error}</div>}
+          {error && (
+            <div className={styles.error} role="alert" aria-live="polite">
+              {error}
+            </div>
+          )}
           <input
             type="password"
             className={styles.input}
@@ -51,9 +65,14 @@ export default function AdminPasswordModal({ onSuccess }: AdminPasswordModalProp
               setPassword(e.target.value)
               setError('')
             }}
+            onKeyDown={handleKeyDown}
+            aria-label="Admin password"
+            aria-invalid={!!error}
+            aria-describedby={error ? 'password-error' : undefined}
             autoFocus
           />
-          <button type="submit" className={styles.button}>
+          {error && <div id="password-error" className={styles.srOnly}>{error}</div>}
+          <button type="submit" className={styles.button} aria-label="Unlock admin panel">
             Unlock
           </button>
         </form>

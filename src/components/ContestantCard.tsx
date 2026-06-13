@@ -1,6 +1,7 @@
 'use client'
 
 import { Contestant } from '@/lib/types'
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import styles from './ContestantCard.module.css'
 
@@ -79,8 +80,15 @@ export default function ContestantCard({
     <div className={`${styles.card} ${getBorderClass()} ${isFlashing ? styles.flash : ''}`}>
       {contestant.picture_url && (
         <div className={styles.pictureContainer}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={contestant.picture_url} alt={contestant.name} className={styles.picture} />
+          <Image
+            src={contestant.picture_url}
+            alt={contestant.name}
+            fill
+            className={styles.picture}
+            style={{ objectFit: 'cover' }}
+            sizes="(max-width: 768px) 150px, 200px"
+            priority={sectionRank <= 3}
+          />
         </div>
       )}
       <div className={getPositionBadgeClass()}>{getMedalEmoji(sectionRank)}</div>
@@ -93,6 +101,8 @@ export default function ContestantCard({
         <button
           className={styles.watchButton}
           onClick={() => onWatchClick(contestant)}
+          aria-label={`Watch intro video for ${contestant.name}`}
+          title={`Watch intro video for ${contestant.name}`}
         >
           ▶ Watch Intro
         </button>

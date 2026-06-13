@@ -1,0 +1,65 @@
+/**
+ * Accessibility utilities
+ * These classes help with screen reader support and keyboard navigation
+ */
+
+/* Screen reader only - visually hidden but available to assistive technologies */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to main content link - shown on keyboard focus */
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+}
+
+.skipLink:focus {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  background: #000;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 0 0 4px 4px;
+}
+
+/* Keyboard focus indicator */
+.focusVisible:focus-visible {
+  outline: 2px solid #00e5ff;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  button {
+    border: 2px solid currentColor;
+  }
+  
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+}

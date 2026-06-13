@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Contestant, Section } from '@/lib/types'
+import { apiPost } from '@/lib/clientApi'
 import styles from './LiveScoreBoard.module.css'
 
 interface LiveScoreBoardProps {
@@ -37,29 +38,13 @@ export default function LiveScoreBoard({
     )
 
     try {
-      const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
-      if (!adminPassword) {
-        throw new Error('Admin password not configured')
-      }
-
-      const res = await fetch('/api/scores', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-password': adminPassword,
-        },
-        body: JSON.stringify({ id, score: newScore }),
-      })
-
-      if (!res.ok) {
-        // Revert on error
-        setContestants((prev) =>
-          prev.map((c) => (c.id === id ? { ...c, score: c.score } : c))
-        )
-        throw new Error('Failed to update score')
-      }
+      await apiPost('/api/scores', { id, score: newScore })
     } catch (error) {
       console.error('Error updating score:', error)
+      // Revert on error
+      setContestants((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, score: c.score } : c))
+      )
       alert(`Failed to update score: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }

@@ -1,14 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import HeroSection from '@/components/HeroSection'
 import SectionTabs from '@/components/SectionTabs'
 import ContestantGrid from '@/components/ContestantGrid'
 import LiveLeaderboard from '@/components/LiveLeaderboard'
 import SponsorBar from '@/components/SponsorBar'
-import VideoModal from '@/components/VideoModal'
+import { GridSkeleton } from '@/components/shared/LoadingSkeleton'
 import { supabase } from '@/lib/supabase'
 import { Contestant, Section, Sponsor } from '@/lib/types'
+
+// Dynamically import VideoModal to reduce bundle size
+const VideoModal = dynamic(() => import('@/components/VideoModal'), {
+  loading: () => <div />,
+  ssr: false,
+})
 
 export default function Home() {
   const [sections, setSections] = useState<Section[]>([])
@@ -95,11 +102,11 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div style={{ background: '#090d26', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#FFD700', fontFamily: 'Bebas Neue, sans-serif', fontSize: '24px' }}>
-          Loading...
-        </div>
-      </div>
+      <>
+        <HeroSection />
+        <SectionTabs sections={[]} activeSection={null} onSectionChange={() => {}} />
+        <GridSkeleton count={6} />
+      </>
     )
   }
 

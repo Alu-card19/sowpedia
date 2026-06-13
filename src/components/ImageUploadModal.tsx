@@ -2,7 +2,9 @@
 
 import { useState, useRef } from 'react'
 import { Contestant } from '@/lib/types'
+import Image from 'next/image'
 import { getSupabase } from '@/lib/supabase'
+import { apiRawFetch } from '@/lib/clientApi'
 import styles from './ImageUploadModal.module.css'
 
 interface ImageUploadModalProps {
@@ -92,11 +94,10 @@ export default function ImageUploadModal({
         throw new Error('Admin password not configured')
       }
 
-      const res = await fetch('/api/contestants', {
+      const res = await apiRawFetch('/api/contestants', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-password': adminPassword,
         },
         body: JSON.stringify({
           id: contestant.id,
@@ -136,11 +137,10 @@ export default function ImageUploadModal({
         throw new Error('Admin password not configured')
       }
 
-      const res = await fetch('/api/contestants', {
+      const res = await apiRawFetch('/api/contestants', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-password': adminPassword,
         },
         body: JSON.stringify({
           id: contestant.id,
@@ -164,11 +164,22 @@ export default function ImageUploadModal({
   if (!isOpen) return null
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.modalOverlay} onClick={onClose} role="presentation">
+      <div 
+        className={styles.modal} 
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-labelledby="upload-modal-title"
+        aria-modal="true"
+      >
         <div className={styles.header}>
-          <h2 className={styles.title}>Upload Picture</h2>
-          <button className={styles.closeButton} onClick={onClose}>
+          <h2 className={styles.title} id="upload-modal-title">Upload Picture</h2>
+          <button 
+            className={styles.closeButton} 
+            onClick={onClose}
+            aria-label="Close upload dialog"
+            title="Close dialog"
+          >
             ✕
           </button>
         </div>
@@ -179,8 +190,21 @@ export default function ImageUploadModal({
           {/* Preview */}
           {preview && (
             <div className={styles.previewContainer}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={preview} alt={contestant.name} className={styles.preview} />
+              {preview.startsWith('data:') ? (
+                // Local preview - use img tag
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={preview} alt={`Current picture for ${contestant.name}`} className={styles.preview} />
+              ) : (
+                // Uploaded image - use Image component
+                <Image
+                  src={preview}
+                  alt={`Current picture for ${contestant.name}`}
+                  fill
+                  className={styles.preview}
+                  style={{ objectFit: 'cover' }}
+                  sizes="300px"
+                />
+              )}
             </div>
           )}
 
@@ -193,26 +217,39 @@ export default function ImageUploadModal({
               onChange={handleFileSelect}
               className={styles.fileInput}
               disabled={uploading}
+              aria-label="Select image file"
+              aria-describedby="file-format-help"
             />
             <button
               type="button"
               className={styles.selectButton}
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
+              aria-label={file ? `Change image (current: ${file.name})` : 'Select image file'}
             >
               {file ? 'Change Image' : 'Select Image'}
             </button>
+            <span id="file-format-help" className="srOnly">
+              Accepted formats: JPEG, PNG, WebP, SVG. Maximum file size: 5MB
+            </span>
           </div>
 
-          {file && <p className={styles.fileName}>{file.name}</p>}
+          {file && <p className={styles.fileName} aria-live="polite">{file.name}</p>}
 
           {/* Progress Bar */}
           {uploading && progress > 0 && (
             <div className={styles.progressContainer}>
-              <div className={styles.progressBar}>
+              <div 
+                className={styles.progressBar}
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Upload progress"
+              >
                 <div className={styles.progressFill} style={{ width: `${progress}%` }} />
               </div>
-              <p className={styles.progressText}>{progress}%</p>
+              <p className={styles.progressText} aria-live="polite">{progress}% complete</p>
             </div>
           )}
         </div>
@@ -224,6 +261,7 @@ export default function ImageUploadModal({
               className={`${styles.button} ${styles.buttonDanger}`}
               onClick={handleRemoveImage}
               disabled={uploading}
+              aria-label={`Remove current picture for ${contestant.name}`}
             >
               Remove Current
             </button>
@@ -241,6 +279,7 @@ export default function ImageUploadModal({
             className={styles.button}
             onClick={handleUpload}
             disabled={!file || uploading}
+            aria-busy={uploading}
           >
             {uploading ? `Uploading... ${progress}%` : 'Upload'}
           </button>

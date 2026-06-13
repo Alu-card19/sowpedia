@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import styles from './HeroSection.module.css'
 
 export default function HeroSection() {
@@ -28,8 +29,14 @@ export default function HeroSection() {
   return (
     <section className={styles.hero}>
       <div className={styles.logoContainer}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.jpeg" alt="SOW Logo" className={styles.logo} />
+        <Image
+          src="/logo.jpeg"
+          alt="SOW Logo"
+          width={200}
+          height={200}
+          className={styles.logo}
+          priority
+        />
       </div>
       <h1 className={styles.heading}>SEAT OF WISDOM GROUP OF SCHOOLS</h1>
       <p className={styles.subheading}>Spelling Bee Championship</p>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Sponsor } from '@/lib/types'
+import { apiPostFormData, apiDelete } from '@/lib/clientApi'
 import styles from './SponsorsTab.module.css'
 
 interface SponsorsTabProps {
@@ -33,22 +34,14 @@ export default function SponsorsTab({ sponsors, onRefresh }: SponsorsTabProps) {
       formData.append('name', name)
       formData.append('file', file)
 
-      const res = await fetch('/api/sponsors', {
-        method: 'POST',
-        headers: {
-          'x-admin-password': process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025',
-        },
-        body: formData,
-      })
-
-      if (res.ok) {
-        setName('')
-        setFile(null)
-        setFileName('')
-        onRefresh()
-      }
+      await apiPostFormData('/api/sponsors', formData)
+      setName('')
+      setFile(null)
+      setFileName('')
+      onRefresh()
     } catch (error) {
       console.error('Error adding sponsor:', error)
+      alert(`Failed to add sponsor: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
@@ -58,15 +51,11 @@ export default function SponsorsTab({ sponsors, onRefresh }: SponsorsTabProps) {
     if (!confirm('Delete this sponsor?')) return
 
     try {
-      await fetch(`/api/sponsors?id=${id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-admin-password': process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025',
-        },
-      })
+      await apiDelete(`/api/sponsors?id=${id}`)
       onRefresh()
     } catch (error) {
       console.error('Error deleting:', error)
+      alert(`Failed to delete: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

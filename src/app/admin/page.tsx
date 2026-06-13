@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import AdminPasswordModal from '@/components/AdminPasswordModal'
+import dynamic from 'next/dynamic'
 import AdminTabs from '@/components/AdminTabs'
 import ContestantsTab from '@/components/ContestantsTab'
 import SponsorsTab from '@/components/SponsorsTab'
@@ -9,6 +9,12 @@ import LiveScoreBoard from '@/components/LiveScoreBoard'
 import { supabase } from '@/lib/supabase'
 import { Contestant, Section, Sponsor } from '@/lib/types'
 import styles from './page.module.css'
+
+// Dynamically import password modal to reduce initial bundle
+const AdminPasswordModal = dynamic(() => import('@/components/AdminPasswordModal'), {
+  loading: () => <div className={styles.loadingContainer}>Loading...</div>,
+  ssr: false,
+})
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)

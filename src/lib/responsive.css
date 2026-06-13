@@ -1,0 +1,34 @@
+/**
+ * Responsive design system and media query helpers
+ * Used as a reference for consistent breakpoints across all CSS modules
+ */
+
+/* Breakpoint values */
+/* Mobile: default (320px - 480px) */
+/* Tablet: 481px - 768px */
+/* Desktop: 769px - 1024px */
+/* Wide: 1025px+ */
+
+/* Use these media queries in your CSS modules */
+
+/* Mobile-first approach - base styles are mobile, then enhance for larger screens */
+
+/* @media (min-width: 481px) { } */ /* Tablet */
+/* @media (min-width: 769px) { } */ /* Desktop */
+/* @media (min-width: 1025px) { } */ /* Wide */
+
+/* Or use max-width for specific overrides */
+/* @media (max-width: 480px) { } */ /* Mobile only */
+/* @media (max-width: 768px) { } */ /* Mobile and tablet */
+/* @media (max-width: 1024px) { } */ /* Not wide */
+
+/* Orientation */
+/* @media (orientation: portrait) { } */
+/* @media (orientation: landscape) { } */
+
+/* Touch devices */
+/* @media (hover: none) { } */ /* Touch devices - no hover */
+/* @media (hover: hover) { } */ /* Devices with hover support */
+
+/* High DPI screens */
+/* @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { } */

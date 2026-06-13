@@ -1,0 +1,97 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required {
+  color: #C8102E;
+  font-weight: 700;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  background: #0a0d1a;
+  border: 1px solid #1a1f3a;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  padding: 0 12px;
+}
+
+.inputContainer.focused {
+  border-color: #FFD700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
+
+.inputContainer.hasError {
+  border-color: #C8102E;
+  box-shadow: 0 0 8px rgba(200, 16, 46, 0.3);
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  padding: 12px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #7a7f8f;
+}
+
+.input:disabled {
+  color: #7a7f8f;
+  cursor: not-allowed;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  color: #00E5FF;
+  flex-shrink: 0;
+}
+
+.error {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  color: #C8102E;
+  margin-top: 4px;
+}
+
+.helperText {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  color: #7a7f8f;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .label {
+    font-size: 13px;
+  }
+
+  .input {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .inputContainer {
+    padding: 0 10px;
+  }
+}

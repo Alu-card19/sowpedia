@@ -1,60 +1,52 @@
 import { supabaseServer } from '@/lib/supabase'
 import { CreateContestantSchema, UpdateContestantSchema, DeleteContestantSchema } from '@/lib/validation'
 import { rateLimit } from '@/lib/rateLimit'
-import { NextRequest, NextResponse } from 'next/server'
-import { ZodError } from 'zod'
-
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD 
-
-function validateAdminPassword(request: NextRequest): boolean {
-  const password = request.headers.get('x-admin-password')
-  return password === ADMIN_PASSWORD
-}
-
-function handleValidationError(error: ZodError<unknown>) {
-  const messages = error.issues.map((err) => `${err.path.join('.')}: ${err.message}`).join('; ')
-  return NextResponse.json({ error: `Validation error: ${messages}` }, { status: 400 })
-}
+import { NextRequest } from 'next/server'
+import { checkAdminAuth } from '@/lib/auth'
+import {
+  validateRequestBody,
+  parseJsonBody,
+  getQueryParam,
+  successResponse,
+  withErrorHandling,
+} from '@/lib/apiHelpers'
+import { NotFoundError, DatabaseError } from '@/lib/errors'
+import { RATE_LIMITS } from '@/lib/constants'
 
 export async function GET() {
-  try {
+  return withErrorHandling(async () => {
     const { data, error } = await supabaseServer
       .from('contestants')
       .select('*')
       .order('section')
       .order('score', { ascending: false })
 
-    if (error) throw error
+    if (error) throw new DatabaseError('Failed to fetch contestants')
 
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('Error fetching contestants:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch contestants' },
-      { status: 500 }
-    )
-  }
+    return successResponse(data)
+  })
 }
 
 export async function POST(request: NextRequest) {
-  // Rate limiting - 20 requests per minute per IP
-  const rateLimitResult = rateLimit(request, {
-    windowMs: 60 * 1000,
-    maxRequests: 20,
-  })
+  // Rate limiting
+  const rateLimitResult = rateLimit(
+    request,
+    RATE_LIMITS.CREATE_CONTESTANT
+  )
   if (rateLimitResult.limited) {
     return rateLimitResult.response
   }
 
-  if (!validateAdminPassword(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  return withErrorHandling(async () => {
+    // Auth check
+    checkAdminAuth(request)
 
-  try {
-    const body = await request.json()
-    
-    // Validate input
-    const validatedData = CreateContestantSchema.parse(body)
+    // Parse and validate
+    const body = await parseJsonBody(request)
+    const validation = validateRequestBody(body, CreateContestantSchema)
+    if (!validation.valid) throw validation.error
+
+    const validatedData = validation.data as ReturnType<typeof CreateContestantSchema.parse>
 
     const { data, error } = await supabaseServer
       .from('contestants')
@@ -70,50 +62,40 @@ export async function POST(request: NextRequest) {
       ])
       .select()
 
-    if (error) throw error
+    if (error) throw new DatabaseError('Failed to create contestant')
+    if (!data?.length) throw new DatabaseError('Failed to create contestant')
 
-    return NextResponse.json(data[0])
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return handleValidationError(error)
-    }
-    console.error('Error creating contestant:', error)
-    return NextResponse.json(
-      { error: 'Failed to create contestant' },
-      { status: 500 }
-    )
-  }
+    return successResponse(data[0], 201)
+  })
 }
 
 export async function PUT(request: NextRequest) {
-  // Rate limiting - 30 requests per minute per IP
-  const rateLimitResult = rateLimit(request, {
-    windowMs: 60 * 1000,
-    maxRequests: 30,
-  })
+  // Rate limiting
+  const rateLimitResult = rateLimit(
+    request,
+    RATE_LIMITS.UPDATE_CONTESTANT
+  )
   if (rateLimitResult.limited) {
     return rateLimitResult.response
   }
 
-  if (!validateAdminPassword(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  return withErrorHandling(async () => {
+    // Auth check
+    checkAdminAuth(request)
 
-  try {
-    const body = await request.json()
-    
-    // Validate input
-    const validatedData = UpdateContestantSchema.parse(body)
+    // Parse and validate
+    const body = await parseJsonBody(request)
+    const validation = validateRequestBody(body, UpdateContestantSchema)
+    if (!validation.valid) throw validation.error
 
-    // Build update object - only include fields that are provided
+    const validatedData = validation.data as ReturnType<typeof UpdateContestantSchema.parse>
+
+    // Build update object - only include provided fields
     const updateData: Record<string, unknown> = {}
-    
     if (validatedData.name !== undefined) updateData.name = validatedData.name
     if (validatedData.section !== undefined) updateData.section = validatedData.section
     if (validatedData.youtube_url !== undefined) updateData.youtube_url = validatedData.youtube_url
     if (validatedData.picture_url !== undefined) updateData.picture_url = validatedData.picture_url
-
-    console.log('Updating contestant with:', { id: validatedData.id, updateData })
 
     const { data, error } = await supabaseServer
       .from('contestants')
@@ -121,86 +103,41 @@ export async function PUT(request: NextRequest) {
       .eq('id', validatedData.id)
       .select()
 
-    if (error) {
-      console.error('Supabase error:', error)
-      throw error
-    }
+    if (error) throw new DatabaseError('Failed to update contestant')
+    if (!data?.length) throw new NotFoundError('Contestant not found')
 
-    if (!data || data.length === 0) {
-      console.error('No data returned from update')
-      return NextResponse.json(
-        { error: 'Contestant not found' },
-        { status: 404 }
-      )
-    }
-
-    return NextResponse.json(data[0])
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return handleValidationError(error)
-    }
-    console.error('Error updating contestant:', error)
-    let errorMessage = 'Unknown error'
-    
-    if (error instanceof Error) {
-      errorMessage = error.message
-    } else if (typeof error === 'object' && error !== null) {
-      errorMessage = JSON.stringify(error)
-    } else {
-      errorMessage = String(error)
-    }
-    
-    return NextResponse.json(
-      { error: `Failed to update contestant: ${errorMessage}` },
-      { status: 500 }
-    )
-  }
+    return successResponse(data[0])
+  })
 }
 
 export async function DELETE(request: NextRequest) {
-  // Rate limiting - 10 requests per minute per IP
-  const rateLimitResult = rateLimit(request, {
-    windowMs: 60 * 1000,
-    maxRequests: 10,
-  })
+  // Rate limiting
+  const rateLimitResult = rateLimit(
+    request,
+    RATE_LIMITS.DELETE_CONTESTANT
+  )
   if (rateLimitResult.limited) {
     return rateLimitResult.response
   }
 
-  if (!validateAdminPassword(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  return withErrorHandling(async () => {
+    // Auth check
+    checkAdminAuth(request)
 
-  try {
-    const searchParams = request.nextUrl.searchParams
-    const id = searchParams.get('id')
+    // Get and validate ID
+    const id = getQueryParam(request, 'id', true)
+    const validation = validateRequestBody({ id }, DeleteContestantSchema)
+    if (!validation.valid) throw validation.error
 
-    if (!id) {
-      return NextResponse.json(
-        { error: 'ID is required' },
-        { status: 400 }
-      )
-    }
-
-    // Validate ID
-    const validatedData = DeleteContestantSchema.parse({ id })
+    const validatedData = validation.data as ReturnType<typeof DeleteContestantSchema.parse>
 
     const { error } = await supabaseServer
       .from('contestants')
       .delete()
       .eq('id', validatedData.id)
 
-    if (error) throw error
+    if (error) throw new DatabaseError('Failed to delete contestant')
 
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return handleValidationError(error)
-    }
-    console.error('Error deleting contestant:', error)
-    return NextResponse.json(
-      { error: 'Failed to delete contestant' },
-      { status: 500 }
-    )
-  }
+    return successResponse({ success: true })
+  })
 }

@@ -1,10 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Contestant, Section } from '@/lib/types'
 import { supabaseServer } from '@/lib/supabase'
-import ImageUploadModal from './ImageUploadModal'
+import { apiPost, apiPut, apiDelete } from '@/lib/clientApi'
 import styles from './ContestantsTab.module.css'
+
+// Dynamically import modal to reduce bundle size
+const ImageUploadModal = dynamic(() => import('./ImageUploadModal'), {
+  loading: () => <div>Loading...</div>,
+  ssr: false,
+})
 
 interface ContestantsTabProps {
   contestants: Contestant[]
@@ -36,23 +43,14 @@ export default function ContestantsTab({
 
     setLoading(true)
     try {
-      const res = await fetch('/api/contestants', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-password': process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025',
-        },
-        body: JSON.stringify({ name, section, youtube_url: youtubeUrl }),
-      })
-
-      if (res.ok) {
-        setName('')
-        setYoutubeUrl('')
-        setSection('')
-        onRefresh()
-      }
+      await apiPost('/api/contestants', { name, section, youtube_url: youtubeUrl })
+      setName('')
+      setYoutubeUrl('')
+      setSection('')
+      onRefresh()
     } catch (error) {
       console.error('Error adding contestant:', error)
+      alert(`Failed to add contestant: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
@@ -67,20 +65,14 @@ export default function ContestantsTab({
     setLoading(true)
     try {
       for (const n of names.slice(0, 10)) {
-        await fetch('/api/contestants', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-password': process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025',
-          },
-          body: JSON.stringify({ name: n.trim(), section: bulkSection }),
-        })
+        await apiPost('/api/contestants', { name: n.trim(), section: bulkSection })
       }
       setBulkNames('')
       setBulkSection('')
       onRefresh()
     } catch (error) {
       console.error('Error bulk adding:', error)
+      alert(`Failed to bulk add: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
@@ -90,15 +82,11 @@ export default function ContestantsTab({
     if (!confirm('Are you sure?')) return
 
     try {
-      await fetch(`/api/contestants?id=${id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-admin-password': process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025',
-        },
-      })
+      await apiDelete(`/api/contestants?id=${id}`)
       onRefresh()
     } catch (error) {
       console.error('Error deleting:', error)
+      alert(`Failed to delete: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -130,25 +118,19 @@ export default function ContestantsTab({
         pictureUrl = publicUrl.publicUrl
       }
 
-      await fetch('/api/contestants', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-password': process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'sow2025',
-        },
-        body: JSON.stringify({
-          id,
-          name: editName,
-          section: editSection,
-          youtube_url: editYoutubeUrl,
-          ...(pictureUrl && { picture_url: pictureUrl }),
-        }),
+      await apiPut('/api/contestants', {
+        id,
+        name: editName,
+        section: editSection,
+        youtube_url: editYoutubeUrl,
+        ...(pictureUrl && { picture_url: pictureUrl }),
       })
       setEditingId(null)
       setEditPictureFile(null)
       onRefresh()
     } catch (error) {
       console.error('Error updating:', error)
+      alert(`Failed to update: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
