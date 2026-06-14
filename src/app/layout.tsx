@@ -37,9 +37,62 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Scroll Progress Bar */}
+        <div id="scrollProgressBar" />
+
         <ErrorBoundary>
           {children}
         </ErrorBoundary>
+
+        {/* Back to Top Button */}
+        <button
+          id="backToTopButton"
+          aria-label="Back to top"
+          title="Back to top"
+        >
+          ↑
+        </button>
+
+        {/* Scroll Progress & Back-to-Top Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function updateScrollProgress() {
+                const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = window.scrollY;
+                const scrollPercent = windowHeight > 0 ? (scrolled / windowHeight) * 100 : 0;
+                
+                const progressBar = document.getElementById('scrollProgressBar');
+                if (progressBar) {
+                  progressBar.style.width = scrollPercent + '%';
+                }
+                
+                // Show/hide back-to-top button
+                const button = document.getElementById('backToTopButton');
+                if (button) {
+                  if (window.scrollY > 400) {
+                    button.classList.add('show');
+                  } else {
+                    button.classList.remove('show');
+                  }
+                }
+              }
+              
+              function scrollToTop() {
+                window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                });
+              }
+              
+              window.addEventListener('scroll', updateScrollProgress);
+              const button = document.getElementById('backToTopButton');
+              if (button) {
+                button.addEventListener('click', scrollToTop);
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

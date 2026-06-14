@@ -10,6 +10,13 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 229, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 229, 255, 0.2);
 }
 
 .pictureContainer {
@@ -34,7 +41,21 @@
 
 .card.gold {
   border-color: #FFD700;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+.card.gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid;
+  border-image: conic-gradient(from 0deg, #FFD700, #FFB300, #FFD700) 1;
+  border-radius: 12px;
+  pointer-events: none;
+  animation: borderRotate 4s linear infinite;
 }
 
 .card.silver {
@@ -42,9 +63,46 @@
   box-shadow: 0 0 20px rgba(192, 192, 192, 0.3);
 }
 
+.card.silver::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid;
+  border-image: conic-gradient(from 0deg, #C0C0C0, #E8E8E8, #C0C0C0) 1;
+  border-radius: 12px;
+  pointer-events: none;
+  animation: borderRotate 4s linear infinite;
+}
+
 .card.bronze {
   border-color: #CD7F32;
   box-shadow: 0 0 20px rgba(205, 127, 50, 0.3);
+}
+
+.card.bronze::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid;
+  border-image: conic-gradient(from 0deg, #CD7F32, #E8A855, #CD7F32) 1;
+  border-radius: 12px;
+  pointer-events: none;
+  animation: borderRotate 4s linear infinite;
+}
+
+@keyframes borderRotate {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
 }
 
 .card.flash {
@@ -110,11 +168,12 @@
 
 .score {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 42px;
+  font-size: 48px;
   color: #FFD700;
   margin: 0;
-  font-weight: 700;
+  font-weight: 900;
   line-height: 1;
+  letter-spacing: 2px;
 }
 
 .label {
@@ -141,18 +200,29 @@
   letter-spacing: 0.5px;
   flex-shrink: 0;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+}
+
+.watchButton::before {
+  content: '▶';
+  font-size: 10px;
 }
 
 .watchButton:hover {
   background: #00d4e8;
   transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
 }
 
 .watchButton:active {
   transform: scale(0.98);
 }
 
-/* Tablet - max-width: 768px */
+/* Tablet adjustments */
 @media (max-width: 768px) {
   .card {
     padding: 16px;
@@ -194,7 +264,7 @@
   }
 }
 
-/* Mobile - max-width: 480px */
+/* Mobile */
 @media (max-width: 480px) {
   .card {
     padding: 12px;
@@ -237,5 +307,48 @@
     padding: 6px 10px;
     font-size: 10px;
     border-radius: 6px;
+  }
+}
+
+/* Big Screen Mode */
+@media (min-width: 1400px) {
+  .card {
+    padding: 24px;
+  }
+
+  .pictureContainer {
+    height: 220px;
+    margin-bottom: 20px;
+  }
+
+  .positionBadge {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .name {
+    font-size: 20px;
+    margin-bottom: 16px;
+    min-height: 3em;
+  }
+
+  .score {
+    font-size: 56px;
+    letter-spacing: 3px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .scoreContainer {
+    margin-bottom: 20px;
+  }
+
+  .watchButton {
+    padding: 12px 20px;
+    font-size: 14px;
   }
 }

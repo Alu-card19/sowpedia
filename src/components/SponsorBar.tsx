@@ -9,7 +9,20 @@ interface SponsorBarProps {
 }
 
 export default function SponsorBar({ sponsors }: SponsorBarProps) {
-  if (!sponsors || sponsors.length === 0) return null
+  const hasSponsors = sponsors && sponsors.length > 0
+
+  if (!hasSponsors) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.content}>
+          <h2 className={styles.title}>🤝 Proudly Supported By</h2>
+          <div className={styles.placeholderMessage}>
+            Sponsor logos coming soon
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Sort by order_index
   const sortedSponsors = [...sponsors].sort((a, b) => a.order_index - b.order_index)
@@ -24,7 +37,7 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
     return (
       <div className={styles.container}>
         <div className={styles.content}>
-          <h2 className={styles.title}>Our Sponsors</h2>
+          <h2 className={styles.title}>🤝 Proudly Supported By</h2>
           <div className={styles.marqueeContainer}>
             <div className={styles.marquee}>
               {duplicatedSponsors.map((sponsor, idx) => (
@@ -51,7 +64,7 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <h2 className={styles.title}>Our Sponsors</h2>
+        <h2 className={styles.title}>🤝 Proudly Supported By</h2>
         <div className={styles.gridContainer}>
           {sortedSponsors.map((sponsor) => (
             <div key={sponsor.id} className={styles.logoCard}>

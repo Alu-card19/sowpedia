@@ -58,14 +58,19 @@
   color: #ffffff;
 }
 
+.table tr {
+  transition: all 0.3s ease;
+}
+
 .table tr:hover {
-  background: rgba(0, 229, 255, 0.05);
+  background: rgba(0, 229, 255, 0.08);
 }
 
 .rankCell {
-  font-weight: 700;
+  font-weight: 900;
   color: #FFD700;
-  min-width: 40px;
+  min-width: 50px;
+  font-size: 16px;
 }
 
 .nameCell {
@@ -77,18 +82,45 @@
   color: #00e5ff;
   text-align: right;
   min-width: 60px;
+  font-size: 16px;
 }
 
+/* Top 3 rows with left border accent */
 .row1 {
-  background: rgba(255, 215, 0, 0.1);
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent);
+  border-left: 4px solid #FFD700;
+  animation: highlightPulse 1s ease-out;
+}
+
+.row1 .rankCell::before {
+  content: '👑 ';
+  margin-right: 4px;
 }
 
 .row2 {
-  background: rgba(192, 192, 192, 0.1);
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.12), transparent);
+  border-left: 4px solid #C0C0C0;
+  animation: highlightPulse 1s ease-out 0.1s backwards;
 }
 
 .row3 {
-  background: rgba(205, 127, 50, 0.1);
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.12), transparent);
+  border-left: 4px solid #CD7F32;
+  animation: highlightPulse 1s ease-out 0.2s backwards;
+}
+
+/* Alternating row tint */
+.table tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes highlightPulse {
+  0% {
+    background-color: rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    background-color: rgba(255, 215, 0, 0.08);
+  }
 }
 
 .sectionBadge {
@@ -98,6 +130,16 @@
   border-radius: 50%;
   margin-right: 6px;
   vertical-align: middle;
+}
+
+.updatedTimestamp {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  color: #888;
+  padding: 12px 20px;
+  text-align: center;
+  border-top: 1px solid #1a1f3a;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 1024px) {
@@ -124,5 +166,53 @@
   .table td {
     padding: 8px;
     font-size: 12px;
+  }
+
+  .rankCell,
+  .scoreCell {
+    font-size: 14px;
+  }
+}
+
+/* Big Screen Mode */
+@media (min-width: 1400px) {
+  .leaderboardGrid {
+    gap: 40px;
+  }
+
+  .leaderboardTitle {
+    font-size: 28px;
+    padding: 28px;
+  }
+
+  .table th {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .table td {
+    padding: 16px;
+    font-size: 18px;
+  }
+
+  .rankCell {
+    font-size: 24px;
+    min-width: 70px;
+  }
+
+  .scoreCell {
+    font-size: 22px;
+    min-width: 80px;
+  }
+
+  .row1,
+  .row2,
+  .row3 {
+    border-left-width: 6px;
+  }
+
+  .updatedTimestamp {
+    font-size: 14px;
+    padding: 16px 28px;
   }
 }
