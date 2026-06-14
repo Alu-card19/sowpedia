@@ -12,6 +12,24 @@ interface VideoModalProps {
 export default function VideoModal({ contestant, onClose }: VideoModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
 
+  // Focus management - focus modal on open, restore focus on close
+  useEffect(() => {
+    if (!contestant?.youtube_url) return
+
+    const previousActiveElement = document.activeElement as HTMLElement
+
+    if (modalRef.current) {
+      modalRef.current.focus()
+    }
+
+    return () => {
+      // Restore focus when modal closes
+      if (previousActiveElement) {
+        previousActiveElement.focus()
+      }
+    }
+  }, [contestant])
+
   if (!contestant || !contestant.youtube_url) return null
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -27,22 +45,6 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
       onClose()
     }
   }
-
-  // Focus management - focus modal on open, restore focus on close
-  useEffect(() => {
-    const previousActiveElement = document.activeElement as HTMLElement
-
-    if (modalRef.current) {
-      modalRef.current.focus()
-    }
-
-    return () => {
-      // Restore focus when modal closes
-      if (previousActiveElement) {
-        previousActiveElement.focus()
-      }
-    }
-  }, [])
 
   // Convert YouTube URL to embed format
   const getEmbedUrl = (url: string): string => {

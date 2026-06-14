@@ -34,18 +34,13 @@ const heroImages = [
 export default function HeroSection() {
   const [isLive, setIsLive] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [nextImageIndex, setNextImageIndex] = useState(1)
   const [fadeOut, setFadeOut] = useState(false)
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
   const currentYear = new Date().getFullYear()
 
   // Preload images on mount
   useEffect(() => {
-    heroImages.forEach((src, index) => {
+    heroImages.forEach((src) => {
       const img = new window.Image()
-      img.onload = () => {
-        setLoadedImages((prev) => new Set([...prev, index]))
-      }
       img.onerror = () => {
         // Skip failed images silently
         console.warn(`Failed to load hero image: ${src}`)
@@ -68,7 +63,6 @@ export default function HeroSection() {
       }
       setTimeout(() => {
         setCurrentImageIndex((prev) => (prev + 1) % heroImages.length)
-        setNextImageIndex((prev) => (prev + 1) % heroImages.length)
         setFadeOut(false)
       }, 500)
     }, 5000)
@@ -98,7 +92,6 @@ export default function HeroSection() {
     setFadeOut(true)
     setTimeout(() => {
       setCurrentImageIndex(index)
-      setNextImageIndex((index + 1) % heroImages.length)
       setFadeOut(false)
     }, 500)
   }
