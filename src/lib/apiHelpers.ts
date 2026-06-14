@@ -23,7 +23,7 @@ export function validateRequestBody<T>(
   } catch (error) {
     if (error instanceof ZodError) {
       const messages = error.issues
-        .map((err) => `${err.path.join('.')}: ${err.message}`)
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
         .join('; ')
       return {
         valid: false,
