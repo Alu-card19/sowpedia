@@ -54,7 +54,7 @@ export default function HeroSection() {
     const interval = setInterval(() => {
       setFadeOut(true)
       // Trigger sparkle reset by briefly removing and re-adding the animation
-      const overlay = document.querySelector('[data-sparkle-overlay]')
+      const overlay = document.querySelector('[data-sparkle-overlay]') as HTMLElement | null
       if (overlay) {
         overlay.style.animation = 'none'
         setTimeout(() => {
