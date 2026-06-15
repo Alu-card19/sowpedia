@@ -122,7 +122,7 @@ export function successResponse<T>(data: T, status = 200): NextResponse {
 /**
  * Wrapper for API route handlers with error handling
  */
-export async function withErrorHandling<T>(
+export async function withErrorHandling(
   handler: () => Promise<NextResponse>
 ): Promise<NextResponse> {
   try {
