@@ -9,13 +9,22 @@ interface LiveLeaderboardProps {
 }
 
 const SECTION_COLORS: Record<string, string> = {
-  'Little Sprouts': '#FFD700',
-  'Rising Explorers': '#00e5ff',
-  'Builders League': '#00e676',
-  'Champions Circle': '#C8102E',
-  'Elite Masters': '#00e5ff',
+  'Little Sprouts': '#00e676',
+  'Rising Explorers': '#00bcd4',
+  'Builders League': '#2196f3',
+  'Champions Circle': '#9c27b0',
+  'Elite Masters': '#ff9800',
   'Grand Legends': '#FFD700',
 }
+
+const ALL_SECTIONS = [
+  'Little Sprouts',
+  'Rising Explorers',
+  'Builders League',
+  'Champions Circle',
+  'Elite Masters',
+  'Grand Legends',
+]
 
 export default function LiveLeaderboard({
   contestants,
@@ -31,6 +40,17 @@ export default function LiveLeaderboard({
   const overallContestants = contestants
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
+
+  // Section totals leaderboard
+  const sectionTotals = ALL_SECTIONS.map((section) => ({
+    name: section,
+    total: contestants
+      .filter((c) => c.section === section)
+      .reduce((sum, c) => sum + c.score, 0),
+    count: contestants.filter((c) => c.section === section).length,
+  }))
+    .filter((s) => s.count > 0)
+    .sort((a, b) => b.total - a.total)
 
   const getRowClass = (rank: number) => {
     if (rank === 1) return styles.row1
@@ -94,6 +114,43 @@ export default function LiveLeaderboard({
                       {contestant.section}
                     </td>
                     <td className={styles.scoreCell}>{contestant.score}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Section Totals Leaderboard */}
+        <div className={styles.leaderboardSection}>
+          <div>
+            <h2 className={styles.leaderboardTitle}>🏫 Section Rankings</h2>
+            <p className={styles.subheading}>Total points accumulated per section</p>
+          </div>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Section</th>
+                  <th>Contestants</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sectionTotals.map((section, idx) => (
+                  <tr key={section.name} className={getRowClass(idx + 1)}>
+                    <td className={styles.rankCell}>{idx + 1}</td>
+                    <td>
+                      <span className={styles.sectionBadge}
+                        style={{
+                          backgroundColor: SECTION_COLORS[section.name] || '#FFD700',
+                        }}
+                      />
+                      {section.name}
+                    </td>
+                    <td className={styles.contestantCountCell}>{section.count} contestants</td>
+                    <td className={styles.totalScoreCell}>{section.total}</td>
                   </tr>
                 ))}
               </tbody>
