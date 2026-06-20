@@ -75,3 +75,29 @@ create policy "Admin can delete sponsor logos" on storage.objects for delete usi
 
 drop policy if exists "Admin can delete contestant pictures" on storage.objects;
 create policy "Admin can delete contestant pictures" on storage.objects for delete using (bucket_id = 'contestant-pictures');
+
+
+-- Spelling Words table
+create table spelling_words (
+  id uuid default gen_random_uuid() primary key,
+  word text not null,
+  section text not null,
+  difficulty text check (difficulty in ('easy', 'moderate', 'hard', 'champion')) default null,
+  hint text default null,
+  used boolean default false,
+  created_at timestamptz default now()
+);
+
+-- Enable Row Level Security
+alter table spelling_words enable row level security;
+
+-- Create RLS policies for spelling words
+drop policy if exists "public_spelling_words" on spelling_words;
+create policy "public_spelling_words" on spelling_words for select using (true);
+
+drop policy if exists "admin_spelling_words" on spelling_words;
+create policy "admin_spelling_words" on spelling_words for all using (true) with check (true);
+
+-- Create indexes for performance
+create index if not exists spelling_words_section_idx on spelling_words (section);
+create index if not exists spelling_words_difficulty_idx on spelling_words (difficulty);
