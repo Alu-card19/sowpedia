@@ -16,11 +16,7 @@ const SECTIONS = [
 
 const DIFFICULTIES = ['easy', 'moderate', 'hard', 'champion']
 
-interface SpellingWordsTabProps {
-  onRefresh?: () => void
-}
-
-export default function SpellingWordsTab({ onRefresh }: SpellingWordsTabProps) {
+export default function SpellingWordsTab() {
   const [words, setWords] = useState<SpellingWord[]>([])
   const [filterSection, setFilterSection] = useState<string>('All')
   const [filterDifficulty, setFilterDifficulty] = useState<string>('All')
@@ -136,7 +132,7 @@ export default function SpellingWordsTab({ onRefresh }: SpellingWordsTabProps) {
         throw new Error('CSV must have: word, section, difficulty columns')
       }
 
-      const rowsToInsert: typeof words = []
+      const rowsToInsert: Array<Omit<SpellingWord, 'id' | 'created_at'>> = []
 
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i]
@@ -144,14 +140,12 @@ export default function SpellingWordsTab({ onRefresh }: SpellingWordsTabProps) {
 
         const cells = line.split(',').map((c) => c.trim().replace(/^"|"$/g, ''))
 
-        const word: SpellingWord = {
-          id: '',
+        const word: Omit<SpellingWord, 'id' | 'created_at'> = {
           word: cells[wordIdx],
           section: cells[sectionIdx],
-          difficulty: cells[difficultyIdx] as any,
+          difficulty: cells[difficultyIdx] as 'easy' | 'moderate' | 'hard' | 'champion',
           hint: hintIdx >= 0 ? cells[hintIdx] || null : null,
           used: false,
-          created_at: new Date().toISOString(),
         }
 
         if (
@@ -172,9 +166,9 @@ export default function SpellingWordsTab({ onRefresh }: SpellingWordsTabProps) {
       // Insert in batches
       const batchSize = 50
       for (let i = 0; i < rowsToInsert.length; i += batchSize) {
-        const batch = rowsToInsert.slice(i, i + batchSize).map(({ id, created_at, ...w }) => w)
+        const batch = rowsToInsert.slice(i, i + batchSize)
 
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('spelling_words')
           .insert(batch)
           .select()

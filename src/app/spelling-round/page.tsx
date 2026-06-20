@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { SpellingWord, Sponsor, Section } from '@/lib/types'
 import styles from './page.module.css'
@@ -76,27 +77,8 @@ export default function SpellingRoundPage() {
     fetchData()
   }, [])
 
-  // Generate floating animations for sponsors
-  const generateAnimation = useCallback(
-    (index: number, total: number) => {
-      const speed = 20 + Math.random() * 25 // 20s to 45s
-      const angle = (Math.random() * 360) * (Math.PI / 180)
-      const distance = Math.max(window.innerWidth, window.innerHeight) * 1.5
-      const startX = Math.random() * window.innerWidth
-      const startY = Math.random() * window.innerHeight
-
-      return {
-        animation: `float-${index} ${speed}s linear infinite`,
-        style: {
-          '--startX': `${startX}px`,
-          '--startY': `${startY}px`,
-          '--endX': `${Math.cos(angle) * distance}px`,
-          '--endY': `${Math.sin(angle) * distance}px`,
-        } as React.CSSProperties,
-      }
-    },
-    []
-  )
+  // Generate floating animations for sponsors (kept for reference)
+  // Animations are generated dynamically in the useEffect below
 
   // Filter words based on section, difficulty, and search
   const filteredWords = words.filter((word) => {
@@ -341,9 +323,13 @@ export default function SpellingRoundPage() {
                 animation: `float-${index} ${speed}s linear infinite`,
               } as React.CSSProperties}
             >
-              {sponsor.logo_url && (
-                <img src={sponsor.logo_url} alt={sponsor.name} />
-              )}
+                <Image
+                  src={sponsor.logo_url || '/logo.jpeg'}
+                  alt={sponsor.name}
+                  width={size}
+                  height={size}
+                  priority={false}
+                />
             </div>
           )
         })}
@@ -597,9 +583,11 @@ export default function SpellingRoundPage() {
             </div>
           ) : (
             <div className={styles.emptyState}>
-              <img
+              <Image
                 src="/logo.jpeg"
                 alt="School Logo"
+                width={120}
+                height={120}
                 className={styles.schoolLogo}
               />
               <div className={styles.emptyStateTitle}>
