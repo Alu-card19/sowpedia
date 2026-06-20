@@ -49,6 +49,7 @@ export default function SpellingWordsTab() {
 
   useEffect(() => {
     fetchWords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Filter words
@@ -132,7 +133,13 @@ export default function SpellingWordsTab() {
         throw new Error('CSV must have: word, section, difficulty columns')
       }
 
-      const rowsToInsert: Array<Omit<SpellingWord, 'id' | 'created_at'>> = []
+      const rowsToInsert: Array<{
+        word: string
+        section: string
+        difficulty: 'easy' | 'moderate' | 'hard' | 'champion'
+        hint: string | null
+        used: boolean
+      }> = []
 
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i]
@@ -140,7 +147,7 @@ export default function SpellingWordsTab() {
 
         const cells = line.split(',').map((c) => c.trim().replace(/^"|"$/g, ''))
 
-        const word: Omit<SpellingWord, 'id' | 'created_at'> = {
+        const word = {
           word: cells[wordIdx],
           section: cells[sectionIdx],
           difficulty: cells[difficultyIdx] as 'easy' | 'moderate' | 'hard' | 'champion',
@@ -168,12 +175,12 @@ export default function SpellingWordsTab() {
       for (let i = 0; i < rowsToInsert.length; i += batchSize) {
         const batch = rowsToInsert.slice(i, i + batchSize)
 
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('spelling_words')
           .insert(batch)
           .select()
 
-        if (error) throw error
+        if (insertError) throw insertError
 
         setImportProgress(
           Math.round(((i + batch.length) / rowsToInsert.length) * 100)

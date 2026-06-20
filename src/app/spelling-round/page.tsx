@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
-import { SpellingWord, Sponsor, Section } from '@/lib/types'
+import { SpellingWord, Sponsor } from '@/lib/types'
 import styles from './page.module.css'
 
 const SECTIONS = [
@@ -110,7 +110,7 @@ export default function SpellingRoundPage() {
   }
 
   // Create confetti
-  const createConfetti = () => {
+  const createConfetti = useCallback(() => {
     if (!confettiRef.current) return
 
     const colors = ['#FFD700', '#00e5ff', '#00e676', '#ffffff']
@@ -129,10 +129,10 @@ export default function SpellingRoundPage() {
 
       setTimeout(() => piece.remove(), 2000)
     }
-  }
+  }, [])
 
   // Create floating emojis
-  const createEmojis = () => {
+  const createEmojis = useCallback(() => {
     const emojis = ['🎉', '🎊', '🥳']
     const centerX = window.innerWidth / 2
     const centerY = window.innerHeight / 2 + 100
@@ -149,10 +149,10 @@ export default function SpellingRoundPage() {
 
       setTimeout(() => emojiEl.remove(), 2000)
     })
-  }
+  }, [])
 
   // Handle correct
-  const handleCorrect = () => {
+  const handleCorrect = useCallback(() => {
     if (!selectedWord) return
 
     setAnimationState('correct')
@@ -184,10 +184,10 @@ export default function SpellingRoundPage() {
       setSelectedWord(null)
       setRevealed(false)
     }, 3000)
-  }
+  }, [selectedWord, usedWordIds, contestantName, createConfetti, createEmojis])
 
   // Handle wrong
-  const handleWrong = () => {
+  const handleWrong = useCallback(() => {
     if (!selectedWord) return
 
     setAnimationState('wrong')
@@ -233,7 +233,7 @@ export default function SpellingRoundPage() {
     animationTimeoutRef.current = setTimeout(() => {
       setAnimationState('idle')
     }, 1000)
-  }
+  }, [selectedWord, usedWordIds])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -258,20 +258,19 @@ export default function SpellingRoundPage() {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [selectedWord, revealed, isHostView])
+  }, [selectedWord, revealed, isHostView, handleCorrect, handleWrong])
 
   // Create CSS for floating animations
   useEffect(() => {
     const style = document.createElement('style')
     sponsors.forEach((_, index) => {
-      const speed = 20 + Math.random() * 25
-      const angle = Math.random() * 360
-      const distance = Math.max(window.innerWidth, window.innerHeight) * 1.5
+      const floatAngle = Math.random() * 360
+      const floatDistance = Math.max(window.innerWidth, window.innerHeight) * 1.5
 
       style.textContent += `
         @keyframes float-${index} {
           0% { transform: translate(${Math.random() * window.innerWidth}px, ${Math.random() * window.innerHeight}px); }
-          100% { transform: translate(${Math.cos((angle * Math.PI) / 180) * distance}px, ${Math.sin((angle * Math.PI) / 180) * distance}px); }
+          100% { transform: translate(${Math.cos((floatAngle * Math.PI) / 180) * floatDistance}px, ${Math.sin((floatAngle * Math.PI) / 180) * floatDistance}px); }
         }
       `
     })
@@ -309,9 +308,6 @@ export default function SpellingRoundPage() {
       <div className={styles.sponsorsContainer}>
         {sponsors.map((sponsor, index) => {
           const size = 80 + Math.random() * 60 // 80px to 140px
-          const speed = 20 + Math.random() * 25
-          const angle = Math.random() * 360
-          const distance = Math.max(window.innerWidth, window.innerHeight) * 1.5
 
           return (
             <div
@@ -320,7 +316,7 @@ export default function SpellingRoundPage() {
               style={{
                 width: size,
                 height: size,
-                animation: `float-${index} ${speed}s linear infinite`,
+                animation: `float-${index} ${20 + Math.random() * 25}s linear infinite`,
               } as React.CSSProperties}
             >
                 <Image

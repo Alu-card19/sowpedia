@@ -1,13 +1,12 @@
 import { supabaseServer } from '@/lib/supabase'
 import { NextRequest } from 'next/server'
 import {
-  validateRequestBody,
   parseJsonBody,
   getQueryParam,
   successResponse,
   withErrorHandling,
 } from '@/lib/apiHelpers'
-import { DatabaseError, NotFoundError } from '@/lib/errors'
+import { DatabaseError } from '@/lib/errors'
 
 export async function GET(request: NextRequest) {
   return withErrorHandling(async () => {
