@@ -16,7 +16,8 @@ const SECTIONS = [
 
 const DIFFICULTIES = ['easy', 'moderate', 'hard', 'champion']
 
-export default function SpellingWordsTab() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
   const [words, setWords] = useState<SpellingWord[]>([])
   const [filterSection, setFilterSection] = useState<string>('All')
   const [filterDifficulty, setFilterDifficulty] = useState<string>('All')
