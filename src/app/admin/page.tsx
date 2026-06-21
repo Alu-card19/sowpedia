@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import AdminTabs from '@/components/AdminTabs'
 import ContestantsTab from '@/components/ContestantsTab'
 import SponsorsTab from '@/components/SponsorsTab'
+import SpellingWordsTab from '@/components/SpellingWordsTab'
 import LiveScoreBoard from '@/components/LiveScoreBoard'
 import { supabase } from '@/lib/supabase'
 import { Contestant, Section, Sponsor } from '@/lib/types'
@@ -144,6 +145,10 @@ export default function AdminPage() {
 
         {activeTab === 'Sponsors' && (
           <SponsorsTab sponsors={sponsors} onRefresh={() => {}} />
+        )}
+
+        {activeTab === 'Spelling Words' && (
+          <SpellingWordsTab onRefresh={() => {}} />
         )}
 
         {activeTab === 'Live Board' && (

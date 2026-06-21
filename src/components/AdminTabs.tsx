@@ -9,7 +9,7 @@ interface AdminTabsProps {
 }
 
 export default function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
-  const tabs = ['Contestants', 'Sponsors', 'Live Board']
+  const tabs = ['Contestants', 'Sponsors', 'Spelling Words', 'Live Board']
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const handleTabClick = (tab: string) => {

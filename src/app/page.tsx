@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import Navigation from '@/components/Navigation'
 import HeroSection from '@/components/HeroSection'
 import SectionTabs from '@/components/SectionTabs'
 import ContestantGrid from '@/components/ContestantGrid'
@@ -103,6 +104,7 @@ export default function Home() {
   if (loading) {
     return (
       <>
+        <Navigation />
         <HeroSection />
         <SectionTabs sections={[]} activeSection={null} onSectionChange={() => {}} />
         <GridSkeleton count={6} />
@@ -112,6 +114,7 @@ export default function Home() {
 
   return (
     <>
+      <Navigation />
       <HeroSection />
       <SectionTabs
         sections={sections}
