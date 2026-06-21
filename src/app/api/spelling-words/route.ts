@@ -6,7 +6,7 @@ import {
   successResponse,
   withErrorHandling,
 } from '@/lib/apiHelpers'
-import { DatabaseError } from '@/lib/errors'
+import { DatabaseError, AppError } from '@/lib/errors'
 
 export async function GET(request: NextRequest) {
   return withErrorHandling(async () => {
@@ -36,31 +36,41 @@ export async function POST(request: NextRequest) {
     // Validate admin auth
     const adminPassword = request.headers.get('x-admin-password')
     if (adminPassword !== 'sow2025') {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'content-type': 'application/json' },
-      })
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED')
     }
 
     const body = await parseJsonBody(request)
-    const words = Array.isArray(body) ? body : body.words || []
+    
+    // Type guard: extract words array from body
+    let words: unknown[] = []
+    if (Array.isArray(body)) {
+      words = body
+    } else if (body && typeof body === 'object' && 'words' in body && Array.isArray((body as { words?: unknown }).words)) {
+      words = (body as { words: unknown[] }).words
+    }
 
     if (!Array.isArray(words) || words.length === 0) {
       throw new DatabaseError('Words array is required')
     }
 
     // Validate and insert words
-    const validatedWords = words.map((w) => ({
-      word: w.word?.trim(),
-      section: w.section?.trim(),
-      difficulty: w.difficulty?.trim() || null,
-      hint: w.hint?.trim() || null,
-      used: false,
-    }))
+    const validatedWords = words.map((w) => {
+      if (typeof w !== 'object' || w === null) {
+        return null
+      }
+      const word = w as Record<string, unknown>
+      return {
+        word: typeof word.word === 'string' ? word.word.trim() : '',
+        section: typeof word.section === 'string' ? word.section.trim() : '',
+        difficulty: typeof word.difficulty === 'string' ? word.difficulty.trim() : null,
+        hint: typeof word.hint === 'string' ? word.hint.trim() : null,
+        used: false,
+      }
+    }).filter((w): w is Exclude<typeof w, null> => w !== null)
 
     // Filter out invalid entries
     const validWords = validatedWords.filter(
-      (w) => w.word && w.section && ['easy', 'moderate', 'hard', 'champion'].includes(w.difficulty)
+      (w) => w.word && w.section && ['easy', 'moderate', 'hard', 'champion'].includes(w.difficulty || '')
     )
 
     if (validWords.length === 0) {
@@ -83,10 +93,7 @@ export async function DELETE(request: NextRequest) {
     // Validate admin auth
     const adminPassword = request.headers.get('x-admin-password')
     if (adminPassword !== 'sow2025') {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'content-type': 'application/json' },
-      })
+      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED')
     }
 
     const id = getQueryParam(request, 'id', true)

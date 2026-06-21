@@ -21,3 +21,22 @@ export type Sponsor = {
   logo_url?: string | null
   order_index: number
 }
+
+export type SpellingWord = {
+  id: string
+  word: string
+  section: string
+  difficulty?: 'easy' | 'moderate' | 'hard' | 'champion' | null
+  hint?: string | null
+  used?: boolean
+  created_at: string
+}
+
+export type SpellingRoundState = {
+  selectedWord: SpellingWord | null
+  revealed: boolean
+  contestantName: string
+  usedWordIds: string[]
+  activeSection: string
+  activeDifficulty: string
+}

@@ -220,7 +220,7 @@ export default function SpellingRoundPage() {
     }
 
     // Flash word red
-    const wordEl = document.querySelector(`.${styles.revealedWord}`)
+    const wordEl = document.querySelector(`.${styles.revealedWord}`) as HTMLElement | null
     if (wordEl) {
       wordEl.style.color = '#f44336'
       setTimeout(() => {
