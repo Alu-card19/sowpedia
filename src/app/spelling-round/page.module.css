@@ -780,7 +780,21 @@
 @media (max-width: 1400px) {
   .leftPanel,
   .rightPanel {
-    width: 200px;
+    width: 180px;
+  }
+
+  .content {
+    gap: 12px;
+  }
+
+  .stageCard {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .leftPanel,
+  .rightPanel {
     display: none;
   }
 
