@@ -7,6 +7,7 @@ import {
   withErrorHandling,
 } from '@/lib/apiHelpers'
 import { DatabaseError, AppError } from '@/lib/errors'
+import { SpellingWord } from '@/lib/types'
 import { createClient } from '@supabase/supabase-js'
 
 /**
@@ -28,9 +29,9 @@ function getAdminClient() {
 async function fetchAllSpellingWords(filters?: {
   section?: string
   difficulty?: string
-}) {
+}): Promise<SpellingWord[]> {
   const PAGE_SIZE = 1000
-  let allWords: any[] = []
+  let allWords: SpellingWord[] = []
   let from = 0
   let hasMore = true
 
@@ -53,7 +54,7 @@ async function fetchAllSpellingWords(filters?: {
 
     if (error || !data || data.length === 0) break
 
-    allWords = [...allWords, ...data]
+    allWords = [...allWords, ...(data as SpellingWord[])]
     from += PAGE_SIZE
     hasMore = data.length === PAGE_SIZE
   }
