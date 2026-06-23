@@ -20,6 +20,33 @@ const DIFFICULTIES = ['All', 'Easy', 'Moderate', 'Hard', 'Champion']
 
 type AnimationState = 'idle' | 'correct' | 'wrong'
 
+/**
+ * Fetch all spelling words with pagination to bypass 1000 row limit
+ */
+async function fetchAllSpellingWords() {
+  const PAGE_SIZE = 1000
+  let allWords: SpellingWord[] = []
+  let from = 0
+  let hasMore = true
+
+  while (hasMore) {
+    const query = supabase
+      .from('spelling_words')
+      .select('*')
+      .range(from, from + PAGE_SIZE - 1)
+
+    const { data, error } = await query
+
+    if (error || !data || data.length === 0) break
+
+    allWords = [...allWords, ...data]
+    from += PAGE_SIZE
+    hasMore = data.length === PAGE_SIZE
+  }
+
+  return allWords
+}
+
 export default function SpellingRoundPage() {
   const router = useRouter()
   const [isHostView, setIsHostView] = useState(true)
@@ -53,12 +80,8 @@ export default function SpellingRoundPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch all words
-        const { data: wordsData, error: wordsError } = await supabase
-          .from('spelling_words')
-          .select('*')
-
-        if (wordsError) throw wordsError
+        // Fetch all words with pagination
+        const wordsData = await fetchAllSpellingWords()
         setWords(wordsData || [])
 
         // Fetch sponsors

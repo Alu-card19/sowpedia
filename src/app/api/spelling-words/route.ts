@@ -1,5 +1,5 @@
 import { supabaseServer } from '@/lib/supabase'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import {
   parseJsonBody,
   getQueryParam,
@@ -7,25 +7,66 @@ import {
   withErrorHandling,
 } from '@/lib/apiHelpers'
 import { DatabaseError, AppError } from '@/lib/errors'
+import { createClient } from '@supabase/supabase-js'
+
+/**
+ * Get admin client for write/delete operations
+ */
+function getAdminClient() {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
+  }
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
+
+/**
+ * Fetch all spelling words with pagination to bypass 1000 row limit
+ */
+async function fetchAllSpellingWords(filters?: {
+  section?: string
+  difficulty?: string
+}) {
+  const PAGE_SIZE = 1000
+  let allWords: any[] = []
+  let from = 0
+  let hasMore = true
+
+  while (hasMore) {
+    let query = supabaseServer
+      .from('spelling_words')
+      .select('*')
+      .range(from, from + PAGE_SIZE - 1)
+      .order('word', { ascending: true })
+
+    if (filters?.section && filters.section !== 'All') {
+      query = query.eq('section', filters.section)
+    }
+
+    if (filters?.difficulty && filters.difficulty !== 'All') {
+      query = query.eq('difficulty', filters.difficulty)
+    }
+
+    const { data, error } = await query
+
+    if (error || !data || data.length === 0) break
+
+    allWords = [...allWords, ...data]
+    from += PAGE_SIZE
+    hasMore = data.length === PAGE_SIZE
+  }
+
+  return allWords
+}
 
 export async function GET(request: NextRequest) {
   return withErrorHandling(async () => {
     const section = getQueryParam(request, 'section')
     const difficulty = getQueryParam(request, 'difficulty')
 
-    let query = supabaseServer.from('spelling_words').select('*')
-
-    if (section) {
-      query = query.eq('section', section)
-    }
-
-    if (difficulty && difficulty !== 'All') {
-      query = query.eq('difficulty', difficulty)
-    }
-
-    const { data, error } = await query.order('word', { ascending: true })
-
-    if (error) throw new DatabaseError('Failed to fetch spelling words')
+    const data = await fetchAllSpellingWords({ section: section || undefined, difficulty: difficulty || undefined })
 
     return successResponse(data)
   })
@@ -89,22 +130,77 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  return withErrorHandling(async () => {
-    // Validate admin auth
+  try {
+    // Validate admin password
     const adminPassword = request.headers.get('x-admin-password')
-    if (adminPassword !== 'sow2025') {
-      throw new AppError('Unauthorized', 401, 'UNAUTHORIZED')
+    const expectedPassword =
+      process.env.NEXT_PUBLIC_ADMIN_PASSWORD ||
+      process.env.ADMIN_PASSWORD ||
+      'sow2025'
+
+    if (adminPassword !== expectedPassword) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const id = getQueryParam(request, 'id', true)
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    const section = searchParams.get('section')
+    const deleteAll = searchParams.get('all') === 'true'
 
-    const { error } = await supabaseServer
-      .from('spelling_words')
-      .delete()
-      .eq('id', id)
+    const adminClient = getAdminClient()
 
-    if (error) throw new DatabaseError('Failed to delete spelling word')
+    if (deleteAll && section) {
+      const { error, count } = await adminClient
+        .from('spelling_words')
+        .delete({ count: 'exact' })
+        .eq('section', section)
 
-    return successResponse({ success: true })
-  })
+      if (error) throw error
+
+      return NextResponse.json({
+        success: true,
+        message: `Deleted all words for ${section}`,
+        count,
+      })
+    }
+
+    if (deleteAll && !section) {
+      const { error, count } = await adminClient
+        .from('spelling_words')
+        .delete({ count: 'exact' })
+        .neq('id', '00000000-0000-0000-0000-000000000000')
+
+      if (error) throw error
+
+      return NextResponse.json({
+        success: true,
+        message: 'All spelling words deleted',
+        count,
+      })
+    }
+
+    if (id) {
+      const { error } = await adminClient
+        .from('spelling_words')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      return NextResponse.json({ success: true })
+    }
+
+    return NextResponse.json(
+      { error: 'No valid delete target specified' },
+      { status: 400 }
+    )
+  } catch (error) {
+    console.error('Spelling words delete error:', error)
+    const message =
+      error instanceof Error ? error.message : JSON.stringify(error)
+    return NextResponse.json(
+      { error: `Delete failed: ${message}` },
+      { status: 500 }
+    )
+  }
 }

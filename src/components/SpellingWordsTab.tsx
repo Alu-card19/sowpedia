@@ -16,6 +16,45 @@ const SECTIONS = [
 
 const DIFFICULTIES = ['easy', 'moderate', 'hard', 'champion']
 
+/**
+ * Fetch all spelling words with pagination to bypass 1000 row limit
+ */
+async function fetchAllSpellingWords(filters?: {
+  section?: string
+  difficulty?: string
+}) {
+  const PAGE_SIZE = 1000
+  let allWords: SpellingWord[] = []
+  let from = 0
+  let hasMore = true
+
+  while (hasMore) {
+    let query = supabase
+      .from('spelling_words')
+      .select('*')
+      .range(from, from + PAGE_SIZE - 1)
+      .order('word', { ascending: true })
+
+    if (filters?.section && filters.section !== 'All') {
+      query = query.eq('section', filters.section)
+    }
+
+    if (filters?.difficulty && filters.difficulty !== 'All') {
+      query = query.eq('difficulty', filters.difficulty)
+    }
+
+    const { data, error } = await query
+
+    if (error || !data || data.length === 0) break
+
+    allWords = [...allWords, ...data]
+    from += PAGE_SIZE
+    hasMore = data.length === PAGE_SIZE
+  }
+
+  return allWords
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
   const [words, setWords] = useState<SpellingWord[]>([])
@@ -29,16 +68,11 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
   const [newWord, setNewWord] = useState({ word: '', section: '', difficulty: '', hint: '' })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Fetch words
+  // Fetch words with pagination
   const fetchWords = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('spelling_words')
-        .select('*')
-        .order('word', { ascending: true })
-
-      if (error) throw error
+      const data = await fetchAllSpellingWords()
       setWords(data || [])
     } catch (error) {
       console.error('Error fetching words:', error)
@@ -95,19 +129,29 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
   }
 
   // Delete word
-  const handleDeleteWord = async (id: string) => {
-    if (!confirm('Delete this word?')) return
+  const handleDeleteWord = async (id: string, wordText: string) => {
+    if (!confirm(`Delete "${wordText}"?`)) return
 
     try {
-      const { error } = await supabase.from('spelling_words').delete().eq('id', id)
+      const res = await fetch(`/api/spelling-words?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-admin-password': 'sow2025',
+        },
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }))
+        alert(`Delete failed: ${err.error}`)
+        return
+      }
 
-      setWords(words.filter((w) => w.id !== id))
+      // Remove word from local state immediately
+      setWords((prev) => prev.filter((w) => w.id !== id))
       alert('Word deleted')
     } catch (error) {
-      console.error('Error deleting word:', error)
-      alert('Failed to delete word')
+      alert('Delete failed. Please check your connection and try again.')
+      console.error('Delete error:', error)
     }
   }
 
@@ -210,19 +254,29 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
     }
 
     try {
-      const { error } = await supabase
-        .from('spelling_words')
-        .delete()
-        .eq('section', section)
+      const res = await fetch(
+        `/api/spelling-words?all=true&section=${encodeURIComponent(section)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'x-admin-password': 'sow2025',
+          },
+        }
+      )
 
-      if (error) throw error
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }))
+        alert(`Delete failed: ${err.error}`)
+        return
+      }
 
-      setWords(words.filter((w) => w.section !== section))
+      const result = await res.json()
+      setWords((prev) => prev.filter((w) => w.section !== section))
       setDeleteAllWord('')
-      alert('All words in section deleted')
+      alert(`All words in ${section} deleted (${result.count} words)`)
     } catch (error) {
       console.error('Error deleting section:', error)
-      alert('Failed to delete section words')
+      alert('Delete failed. Please check your connection and try again.')
     }
   }
 
@@ -395,7 +449,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
                 <div className={styles.cellHint}>{word.hint || '—'}</div>
                 <div className={styles.cellAction}>
                   <button
-                    onClick={() => handleDeleteWord(word.id)}
+                    onClick={() => handleDeleteWord(word.id, word.word)}
                     className={styles.deleteButton}
                   >
                     Delete
