@@ -32,8 +32,8 @@ async function fetchAllSpellingWords(filters?: {
     let query = supabase
       .from('spelling_words')
       .select('*')
+      .order('id', { ascending: true })
       .range(from, from + PAGE_SIZE - 1)
-      .order('word', { ascending: true })
 
     if (filters?.section && filters.section !== 'All') {
       query = query.eq('section', filters.section)

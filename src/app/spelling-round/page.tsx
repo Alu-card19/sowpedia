@@ -33,6 +33,7 @@ async function fetchAllSpellingWords() {
     const query = supabase
       .from('spelling_words')
       .select('*')
+      .order('id', { ascending: true })
       .range(from, from + PAGE_SIZE - 1)
 
     const { data, error } = await query
