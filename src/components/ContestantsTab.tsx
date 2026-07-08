@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { Contestant, Section } from '@/lib/types'
 import { supabaseServer } from '@/lib/supabase'
@@ -42,6 +42,26 @@ export default function ContestantsTab({
   const [editYoutubeUrl, setEditYoutubeUrl] = useState('')
   const [editPictureFile, setEditPictureFile] = useState<File | null>(null)
   const [imageUploadContestant, setImageUploadContestant] = useState<Contestant | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterSection, setFilterSection] = useState<string>('')
+
+  // Filter and search contestants
+  const filteredContestants = useMemo(() => {
+    let filtered = [...contestants]
+
+    // Filter by section if selected
+    if (filterSection) {
+      filtered = filtered.filter((c) => c.section === filterSection)
+    }
+
+    // Search by name
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter((c) => c.name.toLowerCase().includes(query))
+    }
+
+    return filtered
+  }, [contestants, searchQuery, filterSection])
 
   const handleAddContestant = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -330,6 +350,47 @@ export default function ContestantsTab({
         <div style={{ gridColumn: '1 / -1' }}>
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>All Contestants</h3>
+            
+            {/* Search and Filter Section */}
+            <div className={styles.filterContainer}>
+              <div className={styles.filterGroup}>
+                <label className={styles.label} htmlFor="searchInput">
+                  Search by Name
+                </label>
+                <input
+                  id="searchInput"
+                  type="text"
+                  className={styles.input}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Type contestant name..."
+                  aria-label="Search contestants by name"
+                />
+              </div>
+              <div className={styles.filterGroup}>
+                <label className={styles.label} htmlFor="filterSelect">
+                  Filter by Category
+                </label>
+                <select
+                  id="filterSelect"
+                  className={styles.select}
+                  value={filterSection}
+                  onChange={(e) => setFilterSection(e.target.value)}
+                  aria-label="Filter contestants by category/section"
+                >
+                  <option value="">All Categories</option>
+                  {sections.map((s) => (
+                    <option key={s.id} value={s.name}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.resultCount}>
+                {filteredContestants.length} of {contestants.length} contestants
+              </div>
+            </div>
+
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -343,111 +404,119 @@ export default function ContestantsTab({
                   </tr>
                 </thead>
                 <tbody>
-                  {contestants.map((c) => (
-                    <tr key={c.id}>
-                      <td>
-                        {editingId === c.id ? (
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => setEditPictureFile(e.target.files?.[0] || null)}
-                            style={{ fontSize: '11px' }}
-                          />
-                        ) : c.picture_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={c.picture_url} alt={c.name} className={styles.pictureThumb} />
-                        ) : (
-                          '–'
-                        )}
-                      </td>
-                      <td>
-                        {editingId === c.id ? (
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                          />
-                        ) : (
-                          c.name
-                        )}
-                      </td>
-                      <td>
-                        {editingId === c.id ? (
-                          <select
-                            className={styles.select}
-                            value={editSection}
-                            onChange={(e) => setEditSection(e.target.value)}
-                          >
-                            {sections.map((s) => (
-                              <option key={s.id} value={s.name}>
-                                {s.name}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          c.section
-                        )}
-                      </td>
-                      <td>{c.score}</td>
-                      <td>
-                        {editingId === c.id ? (
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={editYoutubeUrl}
-                            onChange={(e) => setEditYoutubeUrl(e.target.value)}
-                            placeholder="YouTube URL"
-                          />
-                        ) : (
-                          c.youtube_url ? '✓' : '–'
-                        )}
-                      </td>
-                      <td>
-                        <div className={styles.actionButtons}>
+                  {filteredContestants.length > 0 ? (
+                    filteredContestants.map((c) => (
+                      <tr key={c.id}>
+                        <td>
                           {editingId === c.id ? (
-                            <>
-                              <button
-                                className={styles.buttonSmall}
-                                onClick={() => handleSaveEdit(c.id)}
-                                disabled={loading}
-                              >
-                                {loading ? 'Saving...' : 'Save'}
-                              </button>
-                              <button
-                                className={`${styles.buttonSmall} ${styles.buttonSmallDanger}`}
-                                onClick={handleCancelEdit}
-                              >
-                                Cancel
-                              </button>
-                            </>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setEditPictureFile(e.target.files?.[0] || null)}
+                              style={{ fontSize: '11px' }}
+                            />
+                          ) : c.picture_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={c.picture_url} alt={c.name} className={styles.pictureThumb} />
                           ) : (
-                            <>
-                              <button
-                                className={styles.buttonSmall}
-                                onClick={() => handleImageUploadOpen(c)}
-                                title="Upload picture"
-                              >
-                                📷
-                              </button>
-                              <button
-                                className={styles.buttonSmall}
-                                onClick={() => handleEditClick(c)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className={`${styles.buttonSmall} ${styles.buttonSmallDanger}`}
-                                onClick={() => handleDeleteContestant(c.id)}
-                              >
-                                Delete
-                              </button>
-                            </>
+                            '–'
                           )}
-                        </div>
+                        </td>
+                        <td>
+                          {editingId === c.id ? (
+                            <input
+                              type="text"
+                              className={styles.input}
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                            />
+                          ) : (
+                            c.name
+                          )}
+                        </td>
+                        <td>
+                          {editingId === c.id ? (
+                            <select
+                              className={styles.select}
+                              value={editSection}
+                              onChange={(e) => setEditSection(e.target.value)}
+                            >
+                              {sections.map((s) => (
+                                <option key={s.id} value={s.name}>
+                                  {s.name}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            c.section
+                          )}
+                        </td>
+                        <td>{c.score}</td>
+                        <td>
+                          {editingId === c.id ? (
+                            <input
+                              type="text"
+                              className={styles.input}
+                              value={editYoutubeUrl}
+                              onChange={(e) => setEditYoutubeUrl(e.target.value)}
+                              placeholder="YouTube URL"
+                            />
+                          ) : (
+                            c.youtube_url ? '✓' : '–'
+                          )}
+                        </td>
+                        <td>
+                          <div className={styles.actionButtons}>
+                            {editingId === c.id ? (
+                              <>
+                                <button
+                                  className={styles.buttonSmall}
+                                  onClick={() => handleSaveEdit(c.id)}
+                                  disabled={loading}
+                                >
+                                  {loading ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                  className={`${styles.buttonSmall} ${styles.buttonSmallDanger}`}
+                                  onClick={handleCancelEdit}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  className={styles.buttonSmall}
+                                  onClick={() => handleImageUploadOpen(c)}
+                                  title="Upload picture"
+                                >
+                                  📷
+                                </button>
+                                <button
+                                  className={styles.buttonSmall}
+                                  onClick={() => handleEditClick(c)}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className={`${styles.buttonSmall} ${styles.buttonSmallDanger}`}
+                                  onClick={() => handleDeleteContestant(c.id)}
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className={styles.noResults}>
+                        No contestants found matching your search.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
