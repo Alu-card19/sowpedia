@@ -46,12 +46,17 @@ export default function VideoModal({ contestant, onClose }: VideoModalProps) {
     }
   }
 
-  // Convert YouTube URL to embed format
+  // Convert YouTube URL to embed format (supports regular videos and Shorts)
   const getEmbedUrl = (url: string): string => {
     // Handle youtube.com/watch?v=ID
     const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
     if (watchMatch?.[1]) {
       return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`
+    }
+    // Handle YouTube Shorts - youtube.com/shorts/ID
+    const shortsMatch = url.match(/youtube\.com\/shorts\/([^&\n?#]+)/)
+    if (shortsMatch?.[1]) {
+      return `https://www.youtube.com/embed/${shortsMatch[1]}?autoplay=1`
     }
     // If already in embed format, just add autoplay
     if (url.includes('/embed/')) {
