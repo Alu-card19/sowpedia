@@ -49,7 +49,8 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
     return (
       <div className={styles.container}>
         <div className={styles.content}>
-          <h2 className={styles.title}>🤝 Proudly Supported By</h2>
+          <h2 className={styles.title}>Our Proud Sponsors</h2>
+          <p className={styles.subtitle}>Supporting Mathematical Excellence</p>
           <div className={styles.placeholderMessage}>
             Sponsor logos coming soon
           </div>
@@ -68,7 +69,8 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
         <div className={styles.container}>
           <div className={styles.content}>
             <div className={styles.sponsorHeader}>
-              <h2 className={styles.title}>🤝 Proudly Supported By</h2>
+              <h2 className={styles.title}>Our Proud Sponsors</h2>
+              <p className={styles.subtitle}>Supporting Mathematical Excellence</p>
               {sortedSponsors.length > 0 && (
                 <button
                   className={styles.fullscreenButton}
@@ -104,7 +106,8 @@ export default function SponsorBar({ sponsors }: SponsorBarProps) {
         <div className={styles.container}>
           <div className={styles.content}>
             <div className={styles.sponsorHeader}>
-              <h2 className={styles.title}>🤝 Proudly Supported By</h2>
+              <h2 className={styles.title}>Our Proud Sponsors</h2>
+              <p className={styles.subtitle}>Supporting Mathematical Excellence</p>
               {sortedSponsors.length > 0 && (
                 <button
                   className={styles.fullscreenButton}

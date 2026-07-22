@@ -5,18 +5,27 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { SpellingWord, Sponsor } from '@/lib/types'
+import { DIFFICULTY_LABELS } from '@/lib/constants'
 import styles from './page.module.css'
 
 const SECTIONS = [
-  'Little Sprouts',
-  'Rising Explorers',
-  'Builders League',
-  'Champions Circle',
-  'Elite Masters',
-  'Grand Legends',
+  'Number Sprouts',
+  'Counting Champions',
+  'Math Explorers',
+  'Number Navigators',
+  'Equation Builders',
+  'Logic Leaders',
+  'Problem Solvers',
+  'Math Mavericks',
+  'Junior Analysts',
+  'Algebra Masters',
+  'Olympiad Challengers',
+  'Elite Mathematicians',
+  'Math Titans',
+  'Grand Olympians',
 ]
 
-const DIFFICULTIES = ['All', 'Easy', 'Moderate', 'Hard', 'Champion']
+const DIFFICULTIES = ['All', 'Foundation', 'Intermediate', 'Advanced', 'Olympiad']
 
 type AnimationState = 'idle' | 'correct' | 'wrong'
 
@@ -109,7 +118,7 @@ export default function SpellingRoundPage() {
     const matchSection = word.section === activeSection
     const matchDifficulty =
       activeDifficulty === 'All' ||
-      word.difficulty?.toLowerCase() === activeDifficulty.toLowerCase()
+      DIFFICULTY_LABELS[word.difficulty || 'easy'] === activeDifficulty
     const matchSearch = word.word.toLowerCase().includes(searchTerm.toLowerCase())
     return matchSection && matchDifficulty && matchSearch
   })
@@ -377,7 +386,7 @@ export default function SpellingRoundPage() {
         <div className={`${styles.leftPanel} ${!isHostView ? styles.hidden : ''}`}>
           {/* Section & Difficulty Selectors */}
           <div className={styles.filterSection}>
-            <label className={styles.filterLabel}>Section</label>
+            <label className={styles.filterLabel}>Category</label>
             <div className={styles.selectContainer}>
               <select
                 className={styles.select}
@@ -418,7 +427,7 @@ export default function SpellingRoundPage() {
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="Search words..."
+                placeholder="Search problems..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -433,7 +442,7 @@ export default function SpellingRoundPage() {
             </div>
           </div>
 
-          {/* Word List */}
+          {/* Question List */}
           <div className={styles.wordListContainer}>
             {filteredWords.length === 0 ? (
               <div
@@ -444,7 +453,7 @@ export default function SpellingRoundPage() {
                   fontSize: '12px',
                 }}
               >
-                No words found
+                No problems found
               </div>
             ) : (
               filteredWords.map((word) => (
@@ -470,14 +479,14 @@ export default function SpellingRoundPage() {
           </div>
 
           <div className={styles.wordCount}>
-            Showing {filteredWords.length} of {words.length} words
+            Showing {filteredWords.length} of {words.length} problems
           </div>
 
           <button
             className={styles.resetButton}
             onClick={() => setUsedWordIds([])}
           >
-            Reset Used Words
+            Reset Used Problems
           </button>
 
           <div className={styles.keyboardShortcuts}>
@@ -496,7 +505,7 @@ export default function SpellingRoundPage() {
             <input
               type="text"
               className={styles.contestantInput}
-              placeholder="Contestant spelling this word:"
+              placeholder="Contestant solving this problem:"
               value={contestantName}
               onChange={(e) => setContestantName(e.target.value)}
             />
@@ -556,14 +565,14 @@ export default function SpellingRoundPage() {
                       className={styles.hearButton}
                       onClick={handleHearWord}
                     >
-                      🔊 Hear Word
+                      🔊 Hear Problem
                     </button>
                     {isHostView && (
                       <button
                         className={styles.revealButton}
                         onClick={handleReveal}
                       >
-                        👁 Reveal Word
+                        👁 Reveal Problem
                       </button>
                     )}
                   </>
@@ -597,7 +606,7 @@ export default function SpellingRoundPage() {
                     setAnimationState('idle')
                   }}
                 >
-                  Next Word
+                  Next Problem
                 </button>
               )}
             </div>
@@ -611,11 +620,11 @@ export default function SpellingRoundPage() {
                 className={styles.schoolLogo}
               />
               <div className={styles.emptyStateTitle}>
-                Seat of Wisdom<br />Spelling Bee Championship
+                Seat of Wisdom<br />Maths Olympiad
               </div>
               {isHostView ? (
                 <div className={styles.emptyStateSubtitle}>
-                  Select a word to begin
+                  Select a problem to begin
                 </div>
               ) : (
                 <div className={styles.emptyStateSubtitle}>

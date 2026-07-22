@@ -49,7 +49,8 @@ export default function AdminPasswordModal({ onSuccess }: AdminPasswordModalProp
   return (
     <div className={styles.backdrop} role="presentation">
       <div className={styles.modal} role="dialog" aria-labelledby="admin-modal-title">
-        <h2 className={styles.title} id="admin-modal-title">Admin Panel</h2>
+        <h2 className={styles.title} id="admin-modal-title">Swift Scholars Admin</h2>
+        <p className={styles.subtitle}>Maths Olympiad Control Panel</p>
         <form onSubmit={handleSubmit}>
           {error && (
             <div className={styles.error} role="alert" aria-live="polite">

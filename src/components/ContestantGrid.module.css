@@ -8,6 +8,25 @@
   margin: 0 auto;
 }
 
+.sectionHeading {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: #FFD700;
+  letter-spacing: 0.08em;
+}
+
+.sectionMeta {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
 .grid {
   display: grid;
   gap: 20px;

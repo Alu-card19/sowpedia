@@ -1,3 +1,7 @@
+/**
+ * Swift Scholars Maths Olympiad — Contestants API
+ */
+
 import { supabaseServer } from '@/lib/supabase'
 import { CreateContestantSchema, UpdateContestantSchema, DeleteContestantSchema } from '@/lib/validation'
 import { rateLimit } from '@/lib/rateLimit'

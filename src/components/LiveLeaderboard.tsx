@@ -9,21 +9,37 @@ interface LiveLeaderboardProps {
 }
 
 const SECTION_COLORS: Record<string, string> = {
-  'Little Sprouts': '#00e676',
-  'Rising Explorers': '#00bcd4',
-  'Builders League': '#2196f3',
-  'Champions Circle': '#9c27b0',
-  'Elite Masters': '#ff9800',
-  'Grand Legends': '#FFD700',
+  'Number Sprouts': '#2ecc71',
+  'Counting Champions': '#e67e22',
+  'Math Explorers': '#1abc9c',
+  'Number Navigators': '#3498db',
+  'Equation Builders': '#9b59b6',
+  'Logic Leaders': '#27ae60',
+  'Problem Solvers': '#e74c3c',
+  'Math Mavericks': '#2980b9',
+  'Junior Analysts': '#8e44ad',
+  'Algebra Masters': '#16a085',
+  'Olympiad Challengers': '#d35400',
+  'Elite Mathematicians': '#1a5276',
+  'Math Titans': '#6c3483',
+  'Grand Olympians': '#922b21',
 }
 
 const ALL_SECTIONS = [
-  'Little Sprouts',
-  'Rising Explorers',
-  'Builders League',
-  'Champions Circle',
-  'Elite Masters',
-  'Grand Legends',
+  'Number Sprouts',
+  'Counting Champions',
+  'Math Explorers',
+  'Number Navigators',
+  'Equation Builders',
+  'Logic Leaders',
+  'Problem Solvers',
+  'Math Mavericks',
+  'Junior Analysts',
+  'Algebra Masters',
+  'Olympiad Challengers',
+  'Elite Mathematicians',
+  'Math Titans',
+  'Grand Olympians',
 ]
 
 export default function LiveLeaderboard({
@@ -59,12 +75,20 @@ export default function LiveLeaderboard({
     return ''
   }
 
+  const getRowBorderColor = (rank: number) => {
+    if (rank === 1) return '#FFD700'
+    if (rank === 2) return '#C0C0C0'
+    if (rank === 3) return '#CD7F32'
+    return 'transparent'
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.leaderboardGrid}>
         {/* Section Leaderboard */}
         <div className={styles.leaderboardSection}>
-          <h2 className={styles.leaderboardTitle}>{activeSection} Leaderboard</h2>
+          <h2 className={styles.leaderboardTitle}>🏆 Live Rankings — {activeSection}</h2>
+          <p className={styles.subheading}>Swift Scholars Maths Olympiad</p>
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <thead>
@@ -76,9 +100,13 @@ export default function LiveLeaderboard({
               </thead>
               <tbody>
                 {sectionContestants.map((contestant, idx) => (
-                  <tr key={contestant.id} className={getRowClass(idx + 1)}>
+                  <tr 
+                    key={contestant.id} 
+                    className={getRowClass(idx + 1)}
+                    style={{ borderLeftColor: getRowBorderColor(idx + 1) }}
+                  >
                     <td className={styles.rankCell}>{idx + 1}</td>
-                    <td className={styles.nameCell}>{contestant.name}</td>
+                    <td className={styles.nameCell}>{contestant.name} · {contestant.section}</td>
                     <td className={styles.scoreCell}>{contestant.score}</td>
                   </tr>
                 ))}

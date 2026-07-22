@@ -1,3 +1,7 @@
+/**
+ * Swift Scholars Maths Olympiad — Scores API
+ */
+
 import { supabaseServer } from '@/lib/supabase'
 import { UpdateScoreSchema } from '@/lib/validation'
 import { rateLimit } from '@/lib/rateLimit'

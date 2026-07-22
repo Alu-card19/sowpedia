@@ -3,15 +3,24 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { SpellingWord } from '@/lib/types'
+import { DIFFICULTY_LABELS } from '@/lib/constants'
 import styles from './SpellingWordsTab.module.css'
 
 const SECTIONS = [
-  'Little Sprouts',
-  'Rising Explorers',
-  'Builders League',
-  'Champions Circle',
-  'Elite Masters',
-  'Grand Legends',
+  'Number Sprouts',
+  'Counting Champions',
+  'Math Explorers',
+  'Number Navigators',
+  'Equation Builders',
+  'Logic Leaders',
+  'Problem Solvers',
+  'Math Mavericks',
+  'Junior Analysts',
+  'Algebra Masters',
+  'Olympiad Challengers',
+  'Elite Mathematicians',
+  'Math Titans',
+  'Grand Olympians',
 ]
 
 const DIFFICULTIES = ['easy', 'moderate', 'hard', 'champion']
@@ -282,13 +291,13 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
 
   return (
     <div className={styles.container}>
-      {/* Add Word Form */}
+      {/* Add Question Form */}
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Add New Word</h3>
+        <h3 className={styles.sectionTitle}>Add New Question</h3>
         <div className={styles.formGrid}>
           <input
             type="text"
-            placeholder="Word"
+            placeholder="Problem"
             value={newWord.word}
             onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
             className={styles.input}
@@ -298,7 +307,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
             onChange={(e) => setNewWord({ ...newWord, section: e.target.value })}
             className={styles.input}
           >
-            <option value="">Select Section</option>
+            <option value="">Select Category</option>
             {SECTIONS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -313,7 +322,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
             <option value="">Select Difficulty</option>
             {DIFFICULTIES.map((d) => (
               <option key={d} value={d}>
-                {d.charAt(0).toUpperCase() + d.slice(1)}
+                {DIFFICULTY_LABELS[d as keyof typeof DIFFICULTY_LABELS] || d.charAt(0).toUpperCase() + d.slice(1)}
               </option>
             ))}
           </select>
@@ -325,7 +334,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
             className={styles.input}
           />
           <button onClick={handleAddWord} className={styles.buttonPrimary}>
-            Add Word
+            Add Question
           </button>
         </div>
       </div>
@@ -357,13 +366,13 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
 
       {/* Delete All Section */}
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Delete All Words in Section</h3>
+        <h3 className={styles.sectionTitle}>Delete All Questions in Category</h3>
         <div className={styles.deleteAllContainer}>
           <select
             value=""
             onChange={(e) => {
               if (e.target.value) {
-                if (window.confirm(`Delete all words in ${e.target.value}?`)) {
+                if (window.confirm(`Delete all questions in ${e.target.value}?`)) {
                   const confirmed = prompt("Type 'DELETE' to confirm deletion:")
                   if (confirmed === 'DELETE') {
                     handleDeleteAllInSection(e.target.value)
@@ -373,7 +382,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
             }}
             className={styles.input}
           >
-            <option value="">Select Section</option>
+            <option value="">Select Category</option>
             {SECTIONS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -385,14 +394,14 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
 
       {/* Filters */}
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Words</h3>
+        <h3 className={styles.sectionTitle}>Questions</h3>
         <div className={styles.filterBar}>
           <select
             value={filterSection}
             onChange={(e) => setFilterSection(e.target.value)}
             className={styles.select}
           >
-            <option value="All">All Sections</option>
+            <option value="All">All Categories</option>
             {SECTIONS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -407,13 +416,13 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
             <option value="All">All Difficulties</option>
             {DIFFICULTIES.map((d) => (
               <option key={d} value={d}>
-                {d.charAt(0).toUpperCase() + d.slice(1)}
+                {DIFFICULTY_LABELS[d as keyof typeof DIFFICULTY_LABELS] || d.charAt(0).toUpperCase() + d.slice(1)}
               </option>
             ))}
           </select>
           <input
             type="text"
-            placeholder="Search words..."
+            placeholder="Search problems..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.input}
@@ -427,8 +436,8 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
         ) : (
           <div className={styles.table}>
             <div className={styles.tableHeader}>
-              <div className={styles.cellWord}>Word</div>
-              <div className={styles.cellSection}>Section</div>
+              <div className={styles.cellWord}>Question</div>
+              <div className={styles.cellSection}>Category</div>
               <div className={styles.cellDifficulty}>Difficulty</div>
               <div className={styles.cellHint}>Hint</div>
               <div className={styles.cellAction}>Action</div>
@@ -443,7 +452,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
                       styles[`badge_${word.difficulty || 'easy'}`]
                     }`}
                   >
-                    {word.difficulty?.toUpperCase() || 'EASY'}
+                    {DIFFICULTY_LABELS[word.difficulty || 'easy']?.toUpperCase() || 'FOUNDATION'}
                   </span>
                 </div>
                 <div className={styles.cellHint}>{word.hint || '—'}</div>
@@ -461,7 +470,7 @@ export default function SpellingWordsTab(_props?: { onRefresh?: () => void }) {
         )}
 
         <div className={styles.wordCount}>
-          Showing {filteredWords.length} of {words.length} words
+          Showing {filteredWords.length} of {words.length} problems
         </div>
       </div>
     </div>

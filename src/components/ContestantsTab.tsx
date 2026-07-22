@@ -257,7 +257,7 @@ export default function ContestantsTab({
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label} htmlFor="section">
-                Section *
+                Competition Category *
               </label>
               <select
                 id="section"
@@ -317,7 +317,7 @@ export default function ContestantsTab({
             </div>
             <div className={styles.formGroup}>
               <label className={styles.label} htmlFor="bulkSection">
-                Section *
+                Competition Category *
               </label>
               <select
                 id="bulkSection"
@@ -397,7 +397,7 @@ export default function ContestantsTab({
                   <tr>
                     <th>Picture</th>
                     <th>Name</th>
-                    <th>Section</th>
+                    <th>Category</th>
                     <th>Score</th>
                     <th>Video</th>
                     <th>Actions</th>

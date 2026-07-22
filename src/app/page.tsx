@@ -11,6 +11,8 @@ import SponsorBar from '@/components/SponsorBar'
 import { GridSkeleton } from '@/components/shared/LoadingSkeleton'
 import { supabase } from '@/lib/supabase'
 import { Contestant, Section, Sponsor } from '@/lib/types'
+import { COMPETITION_BOTTOM_LINES } from '@/lib/constants'
+import styles from './page.module.css'
 
 // Dynamically import VideoModal to reduce bundle size
 const VideoModal = dynamic(() => import('@/components/VideoModal'), {
@@ -74,7 +76,7 @@ export default function Home() {
   // Subscribe to realtime updates
   useEffect(() => {
     const channel = supabase
-      .channel('contestants-updates')
+      .channel('olympiad-scores')
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'contestants' },
@@ -132,6 +134,16 @@ export default function Home() {
         activeSection={activeSection}
       />
       <SponsorBar sponsors={sponsors} />
+      <footer className={styles.footer}>
+        <div className={styles.footerGrid}>
+          {COMPETITION_BOTTOM_LINES.map((line, i) => (
+            <div key={i} className={styles.footerItem}>
+              <span>{i === 0 ? '📊' : i === 1 ? '🏆' : '🧠'}</span>
+              <p>{line}</p>
+            </div>
+          ))}
+        </div>
+      </footer>
       <VideoModal
         contestant={selectedContestant}
         onClose={() => setSelectedContestant(null)}

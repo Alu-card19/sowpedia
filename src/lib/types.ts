@@ -1,7 +1,9 @@
 export type Section = {
   id: string
   name: string
+  class_label?: string
   order_index: number
+  created_at: string
 }
 
 export type Contestant = {
@@ -26,9 +28,9 @@ export type SpellingWord = {
   id: string
   word: string
   section: string
-  difficulty?: 'easy' | 'moderate' | 'hard' | 'champion' | null
+  difficulty: 'easy' | 'moderate' | 'hard' | 'champion'
   hint?: string | null
-  used?: boolean
+  used: boolean
   created_at: string
 }
 

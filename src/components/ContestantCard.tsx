@@ -10,6 +10,7 @@ interface ContestantCardProps {
   sectionRank: number
   onWatchClick: (contestant: Contestant) => void
   shouldFlash: boolean
+  categoryColor?: string
 }
 
 export default function ContestantCard({
@@ -17,6 +18,7 @@ export default function ContestantCard({
   sectionRank,
   onWatchClick,
   shouldFlash,
+  categoryColor,
 }: ContestantCardProps) {
   const [displayScore, setDisplayScore] = useState(contestant.score)
   const [isFlashing, setIsFlashing] = useState(false)
@@ -62,6 +64,9 @@ export default function ContestantCard({
     return rank.toString()
   }
 
+  const MATH_WATERMARKS = ['Ω', 'Σ', '√', 'π', '∫', 'Δ', 'θ', '∞']
+  const watermark = MATH_WATERMARKS[contestant.position % MATH_WATERMARKS.length]
+
   const getBorderClass = () => {
     if (sectionRank === 1) return styles.gold
     if (sectionRank === 2) return styles.silver
@@ -78,6 +83,10 @@ export default function ContestantCard({
 
   return (
     <div className={`${styles.card} ${getBorderClass()} ${isFlashing ? styles.flash : ''}`}>
+      <div
+        className={styles.accentBar}
+        style={{ background: categoryColor ?? '#FFD700' }}
+      />
       {contestant.picture_url && (
         <div className={styles.pictureContainer}>
           <Image
@@ -91,9 +100,11 @@ export default function ContestantCard({
           />
         </div>
       )}
+      <span className={styles.watermark}>{watermark}</span>
       <div className={getPositionBadgeClass()}>{getMedalEmoji(sectionRank)}</div>
       <h3 className={styles.name}>{contestant.name}</h3>
       <div className={styles.scoreContainer}>
+        <span className={styles.scoreLabel}>Score</span>
         <p className={styles.score}>{displayScore}</p>
         <p className={styles.label}>PTS</p>
       </div>

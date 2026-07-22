@@ -129,8 +129,8 @@ export default function AdminPage() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Admin Panel</h1>
-          <p className={styles.subtitle}>Spelling Bee Championship Management</p>
+          <h1 className={styles.title}>Swift Scholars — Admin Dashboard</h1>
+          <p className={styles.subtitle}>Maths Olympiad Management</p>
         </div>
 
         <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
@@ -147,7 +147,7 @@ export default function AdminPage() {
           <SponsorsTab sponsors={sponsors} onRefresh={() => {}} />
         )}
 
-        {activeTab === 'Spelling Words' && (
+        {activeTab === 'Maths Questions' && (
           <SpellingWordsTab onRefresh={() => {}} />
         )}
 

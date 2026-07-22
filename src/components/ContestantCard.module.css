@@ -13,6 +13,14 @@
   cursor: pointer;
 }
 
+.accentBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
 .card:hover {
   transform: translateY(-4px);
   border-color: rgba(0, 229, 255, 0.5);
@@ -183,6 +191,27 @@
   margin: 0;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+.scoreLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255, 248, 231, 0.4);
+  display: block;
+  text-align: center;
+}
+
+.watermark {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 3.5rem;
+  color: rgba(255, 215, 0, 0.04);
+  font-family: 'Bebas Neue', sans-serif;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
 }
 
 .watchButton {

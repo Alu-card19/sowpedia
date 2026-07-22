@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { COMPETITION_NAME, SCHOOL_NAME, COMPETITION_SUBTITLE } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -15,8 +16,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "SOW Spelling Bee Championship",
-  description: "Seat of Wisdom Group of Schools Spelling Bee Championship",
+  title: `${COMPETITION_NAME} | ${SCHOOL_NAME}`,
+  description: `${COMPETITION_SUBTITLE} Live leaderboard for the ${COMPETITION_NAME} by ${SCHOOL_NAME}.`,
 };
 
 export default function RootLayout({

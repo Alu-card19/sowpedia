@@ -1,7 +1,21 @@
+:root {
+  --color-bg: #0a1628;
+  --color-bg-secondary: #0d1f3c;
+  --color-gold: #FFD700;
+  --color-gold-dark: #B8860B;
+  --color-cream: #FFF8E7;
+  --color-red-accent: #C0392B;
+  --color-navy: #0a1628;
+  --color-white: #ffffff;
+  --color-border: rgba(255, 215, 0, 0.3);
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-surface-hover: rgba(255, 255, 255, 0.08);
+}
+
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html {
@@ -9,8 +23,8 @@ html {
 }
 
 body {
-  background: #090d26;
-  color: #ffffff;
+  background: var(--color-bg);
+  color: var(--color-cream);
   font-family: 'Nunito', sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -36,6 +50,7 @@ body::before {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
 }
 
 button {
@@ -48,21 +63,21 @@ input, select, textarea {
 
 /* Remove default scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0d1a;
+  background: var(--color-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #FFD700;
-  border-radius: 4px;
+  background: var(--color-gold-dark);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #FFF000;
+  background: var(--color-gold);
 }
 
 /* Scroll Progress Bar */
@@ -71,7 +86,7 @@ input, select, textarea {
   top: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(90deg, #FFD700, #00e5ff, #FFD700);
+  background: linear-gradient(90deg, var(--color-gold), #FFA500, var(--color-gold));
   width: 0%;
   z-index: 9999;
   transition: width 0.1s ease;
@@ -85,8 +100,8 @@ input, select, textarea {
   right: 30px;
   width: 50px;
   height: 50px;
-  background: #FFD700;
-  color: #090d26;
+  background: var(--color-gold);
+  color: var(--color-bg);
   border: none;
   border-radius: 50%;
   font-size: 24px;
@@ -124,6 +139,13 @@ input, select, textarea {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Accessibility utilities */

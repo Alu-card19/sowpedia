@@ -1,3 +1,7 @@
+/**
+ * Swift Scholars Maths Olympiad — Sponsors API
+ */
+
 import { supabaseServer } from '@/lib/supabase'
 import { CreateSponsorSchema, UpdateSponsorSchema, DeleteSponsorSchema } from '@/lib/validation'
 import { rateLimit } from '@/lib/rateLimit'
